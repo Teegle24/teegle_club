@@ -17,7 +17,9 @@ import {
   summaryFor,
   trendFor,
 } from '@/api/mock/snapshot'
-import type { DashboardLayout, Paginated, PeriodKey, PropertyScope, Sale } from '@/types'
+import { saveRevenueGoal, targetViewFor } from '@/api/mock/targets'
+import { fiscalYear, isTargetMetric } from '@/lib/targets'
+import type { DashboardLayout, MetricTarget, Paginated, PeriodKey, PropertyScope, Sale } from '@/types'
 
 const LAYOUT_KEY = 'teegle-club.mock.dashboard-layout.v4'
 
@@ -90,6 +92,30 @@ export async function mockRequest<T>(options: ApiRequestOptions): Promise<T> {
 
   if (path === '/metrics/budget' && method === 'GET') {
     return budgetFor(options.scope, period) as T
+  }
+
+  if (path === '/targets' && method === 'GET') {
+    const year = Number(options.searchParams?.year) || fiscalYear()
+    return targetViewFor(options.scope, period, year) as T
+  }
+
+  if (path === '/targets' && method === 'PUT') {
+    const body = options.body as Partial<MetricTarget> | undefined
+    const metric = body?.metric ?? 'revenue'
+    if (!isTargetMetric(metric)) {
+      throw new ApiError('Only a revenue goal can be set right now', 400, null)
+    }
+    try {
+      const year = Number(body?.year) || fiscalYear()
+      saveRevenueGoal(options.scope, Number(body?.amount), year)
+      return targetViewFor(options.scope, period, year) as T
+    } catch (error) {
+      throw new ApiError(
+        error instanceof Error ? error.message : 'Could not save target',
+        400,
+        null,
+      )
+    }
   }
 
   if (path === '/metrics/comparison' && method === 'GET') {

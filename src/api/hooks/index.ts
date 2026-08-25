@@ -15,3 +15,4 @@ export {
   useOps,
   usePipeline,
 } from './use-dashboard-metrics'
+export { useRevenueTarget, useSaveRevenueTarget } from './use-targets'

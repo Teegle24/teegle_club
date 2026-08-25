@@ -1,4 +1,6 @@
 import { MILL_CREEK, PINE_RIDGE, access } from '@/api/mock/data'
+import { annualRevenueGoal } from '@/api/mock/targets'
+import { periodShareOfAnnual } from '@/lib/targets'
 import type {
   BudgetRow,
   ComparedValue,
@@ -759,7 +761,9 @@ export function summaryFor(
   const utility = scale(row.waterCost + row.electricCost + row.fuelCost, period)
   const comps = scale(row.comps, period)
   const noShows = scale(row.noShowCount, period)
-  const revenueBudget = Math.round(revenue / row.budgetRatio)
+  const annualRevenue = annualRevenueGoal(scope)
+  const revenueBudget =
+    annualRevenue == null ? null : periodShareOfAnnual(annualRevenue, period)
   const roundsBudget = Math.round(rounds / (row.budgetRatio - 0.02))
   const seed = `${row.propertyId}-${period}`
   const revenueSpark = sparklineSeries(
@@ -786,7 +790,7 @@ export function summaryFor(
     currency: 'USD',
     revenue: compared(revenue, row.priorPeriodRatio, row.priorYearRatio, {
       sparkline: revenueSpark,
-      target: revenueBudget,
+      target: revenueBudget ?? undefined,
     }),
     rounds: compared(rounds, row.priorPeriodRatio + 0.01, row.priorYearRatio, {
       sparkline: roundsSpark,
@@ -909,12 +913,17 @@ export function budgetFor(
   const revenue = scale(row.revenue, period)
   const rounds = scale(row.rounds, period)
   const labor = scale(row.laborCost, period)
+  const annualRevenue = annualRevenueGoal(scope)
+  const revenueBudget =
+    annualRevenue == null
+      ? Math.round(revenue / row.budgetRatio)
+      : periodShareOfAnnual(annualRevenue, period)
   return [
     {
       metric: 'revenue',
       label: 'Revenue',
       actual: revenue,
-      budget: Math.round(revenue / row.budgetRatio),
+      budget: revenueBudget,
     },
     {
       metric: 'rounds',

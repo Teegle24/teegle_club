@@ -1,5 +1,6 @@
 import type { ComparedValue, PeriodKey } from '@/types'
 import { Sparkline } from '@/components/dashboard/sparkline'
+import { TargetEditor } from '@/components/dashboard/target-editor'
 import { PRIOR_PERIOD_LABEL } from '@/lib/period-copy'
 import { formatMoney, formatNumber, formatPercent } from '@/lib/format'
 import { usePeriod } from '@/context/period'
@@ -31,6 +32,13 @@ function paceCopy(
   return `${pct.toFixed(0)}% to plan`
 }
 
+const PERIOD_PLAN_LABEL: Record<PeriodKey, string> = {
+  today: 'Today’s plan',
+  wtd: 'This week',
+  mtd: 'This month',
+  ytd: 'Year goal',
+}
+
 export function ComparedBlock({
   value,
   format,
@@ -38,6 +46,7 @@ export function ComparedBlock({
   size = 'lg',
   dark = false,
   compact = false,
+  targetEdit,
 }: {
   value: ComparedValue
   format: 'money' | 'number' | 'percent'
@@ -45,6 +54,13 @@ export function ComparedBlock({
   size?: 'lg' | 'md'
   dark?: boolean
   compact?: boolean
+  targetEdit?: {
+    annual: number | null
+    editable: boolean
+    lockedHint?: string
+    saving?: boolean
+    onSave: (amount: number) => Promise<unknown>
+  }
 }) {
   const { period } = usePeriod()
   const current = value.current ?? 0
@@ -114,8 +130,39 @@ export function ComparedBlock({
         ) : null}
       </div>
 
-      <div className="h-[2.35rem] shrink-0">
-        {target != null ? (
+      <div className="min-h-[2.35rem] shrink-0">
+        {targetEdit ? (
+          <>
+            <TargetEditor
+              annual={targetEdit.annual}
+              periodLabel={PERIOD_PLAN_LABEL[period] ?? 'Plan'}
+              periodAmount={target}
+              pace={pace}
+              editable={targetEdit.editable}
+              lockedHint={targetEdit.lockedHint}
+              saving={targetEdit.saving}
+              dark={dark}
+              compact={compact}
+              onSave={targetEdit.onSave}
+            />
+            {target != null ? (
+              <div
+                className={cn(
+                  'relative mt-1 h-1.5 overflow-hidden rounded-full',
+                  dark ? 'bg-white/10' : 'bg-canvas-2',
+                )}
+              >
+                <div
+                  className={cn(
+                    'h-full rounded-full',
+                    onPace ? (dark ? 'bg-brand-2' : 'bg-brand') : 'bg-destructive/80',
+                  )}
+                  style={{ width: `${Math.max(4, barPct)}%` }}
+                />
+              </div>
+            ) : null}
+          </>
+        ) : target != null ? (
           <>
             <div
               className={cn(

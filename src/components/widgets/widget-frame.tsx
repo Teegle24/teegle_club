@@ -35,14 +35,25 @@ export function WidgetFrame({
     navigate(`/metrics/${widgetId}`)
   }
 
+  const fromNavControl = (target: EventTarget | null) =>
+    target instanceof Element && Boolean(target.closest('[data-stop-nav]'))
+
   return (
     <section
       role={interactive ? 'button' : undefined}
       tabIndex={interactive ? 0 : undefined}
-      onClick={interactive ? openDetail : undefined}
+      onClick={
+        interactive
+          ? (event) => {
+              if (fromNavControl(event.target)) return
+              openDetail()
+            }
+          : undefined
+      }
       onKeyDown={
         interactive
           ? (event) => {
+              if (fromNavControl(event.target)) return
               if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault()
                 openDetail()

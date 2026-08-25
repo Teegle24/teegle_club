@@ -136,6 +136,23 @@ export interface BudgetRow {
   actual: number
 }
 
+export type TargetMetric = 'revenue'
+
+export interface MetricTarget {
+  propertyId: string
+  metric: TargetMetric
+  year: number
+  amount: number
+}
+
+export interface MetricTargetView {
+  metric: TargetMetric
+  year: number
+  annual: number | null
+  periodAmount: number | null
+  editable: boolean
+}
+
 export interface PropertyComparisonRow {
   propertyId: string
   propertyName: string

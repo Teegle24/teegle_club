@@ -16,7 +16,7 @@ import { usePropertyScope } from '@/context/property-scope'
 
 const DETAIL_NOTES: Partial<Record<string, string>> = {
   revenue:
-    'Total revenue rolls up green fees, carts, F&B, pro shop, lessons, and memberships for the selected period. Compare Now vs Prior and LY to spot pacing issues early.',
+    'Total revenue rolls up green fees, carts, F&B, pro shop, lessons, and memberships for the selected period. Click the plan line on the tile to set this year’s dollar goal. Month, week, and today are a linear slice of that year. Compare vs prior and last year separately from the goal.',
   rounds:
     'Rounds played drives utilization and labor planning. A drop here often preceds revenue softness unless revenue per round is rising.',
   utilization:

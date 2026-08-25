@@ -163,7 +163,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
   {
     id: 'revenue',
     title: 'Total revenue',
-    description: 'Today / WTD / MTD / YTD vs prior and last year',
+    description: 'Set a yearly dollar goal; tiles show pace for the selected period',
     category: 'revenue',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'revenue', format: 'money' },
