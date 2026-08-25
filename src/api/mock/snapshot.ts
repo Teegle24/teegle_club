@@ -803,7 +803,7 @@ export function summaryFor(
     ),
     ebitda: compared(scale(row.ebitda, period), row.priorPeriodRatio, row.priorYearRatio, {
       seed: `${seed}-ebitda`,
-      kind: 'volume',
+      kind: 'margin',
     }),
     gop: compared(scale(row.gop, period), row.priorPeriodRatio, row.priorYearRatio, {
       seed: `${seed}-gop`,
