@@ -49,7 +49,7 @@ export function WidgetFrame({
           : undefined
       }
       className={cn(
-        'group relative flex h-full flex-col overflow-hidden rounded-md border shadow-sm transition-shadow',
+        'group relative flex h-full min-h-0 flex-col overflow-hidden rounded-md border shadow-sm transition-shadow',
         interactive && 'cursor-pointer hover:shadow-md',
         featured
           ? 'border-brand/25 bg-navy text-white shadow-brand/10'
@@ -117,7 +117,7 @@ export function WidgetFrame({
           </Button>
         ) : null}
       </header>
-      <div className="min-h-0 flex-1 px-4 pb-4 pt-3">{children}</div>
+      <div className="min-h-0 flex-1 overflow-hidden px-4 pb-3 pt-2">{children}</div>
     </section>
   )
 }

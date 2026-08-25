@@ -95,10 +95,17 @@ function renderKind(kind: WidgetKind) {
   }
 }
 
-export function renderWidgetContent(id: WidgetId, featured = false, dark = featured) {
+export function renderWidgetContent(
+  id: WidgetId,
+  featured = false,
+  dark = featured,
+  compact = false,
+) {
   const widget = widgetById(id)
   if (!widget) return null
-  if (widget.render.kind === 'budget') return <BudgetWidget dark={dark} />
+  if (widget.render.kind === 'budget') {
+    return <BudgetWidget dark={dark} compact={compact} />
+  }
   if (widget.render.kind === 'kpi') {
     return (
       <ComparedKpiWidget

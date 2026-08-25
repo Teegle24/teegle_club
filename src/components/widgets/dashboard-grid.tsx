@@ -29,10 +29,10 @@ function WidgetTile({
   const widget = widgetById(id)
   if (!widget) return null
   const sizeTier = widget.sizeTier
-  const colSpan = COL_SPAN[SIZE_TIERS[sizeTier].w] ?? 'col-span-12'
+  const colSpan = compact ? undefined : (COL_SPAN[SIZE_TIERS[sizeTier].w] ?? 'col-span-12')
 
   return (
-    <div className={cn('col-span-12', colSpan)}>
+    <div className={cn(compact ? 'h-full min-h-0' : cn('col-span-12', colSpan))}>
       <WidgetFrame
         widgetId={id}
         title={widget.title}
@@ -40,10 +40,10 @@ function WidgetTile({
         onRemove={onRemove}
         featured={featured}
         className={cn(
-          compact ? 'min-h-[9.5rem]' : TILE_MIN_HEIGHT[sizeTier],
+          compact ? 'h-full' : TILE_MIN_HEIGHT[sizeTier],
         )}
       >
-        {renderWidgetContent(id, featured)}
+        {renderWidgetContent(id, featured, featured, compact)}
       </WidgetFrame>
     </div>
   )
@@ -100,13 +100,12 @@ export function DashboardGrid({
             No high-level metrics selected. Add them from the sidebar metric list.
           </div>
         ) : (
-          <div className="grid grid-cols-12 gap-3">
+          <div className="grid auto-rows-[12.5rem] grid-cols-12 gap-3">
             {hlIds.map((id) => (
-              <div key={id} className="col-span-12 sm:col-span-6 xl:col-span-3">
+              <div key={id} className="col-span-12 h-full min-h-0 sm:col-span-6 xl:col-span-3">
                 <WidgetTile
                   id={id}
                   onRemove={() => onRemove(id)}
-                  featured={id === 'budget'}
                   compact
                 />
               </div>
