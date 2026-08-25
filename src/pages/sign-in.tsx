@@ -1,7 +1,12 @@
 import { SignedIn, SignedOut, SignIn } from '@clerk/clerk-react'
 import { Navigate } from 'react-router-dom'
+import { isMockMode } from '@/lib/config'
 
 export function SignInPage() {
+  if (isMockMode()) {
+    return <Navigate to="/" replace />
+  }
+
   return (
     <>
       <SignedIn>

@@ -54,3 +54,25 @@ export function formatPeriod(from?: string, to?: string) {
   if (!from || !to) return 'Current period'
   return `${formatDate(from)} – ${formatDate(to)}`
 }
+
+export function formatPercent(
+  value: number | null | undefined,
+  digits = 1,
+) {
+  if (value == null || Number.isNaN(value)) return '—'
+  return `${value.toFixed(digits)}%`
+}
+
+export function deltaPct(
+  current: number | null | undefined,
+  previous: number | null | undefined,
+) {
+  if (current == null || previous == null || previous === 0) return null
+  return ((current - previous) / Math.abs(previous)) * 100
+}
+
+export function formatSignedPercent(value: number | null | undefined) {
+  if (value == null || Number.isNaN(value)) return '—'
+  const prefix = value > 0 ? '+' : ''
+  return `${prefix}${value.toFixed(1)}%`
+}

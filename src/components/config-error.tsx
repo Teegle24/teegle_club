@@ -19,7 +19,11 @@ export function ConfigError() {
           <code className="mx-1 rounded bg-black/30 px-1.5 py-0.5 text-xs">
             .env
           </code>
-          and set:
+          and set the keys below. To click around without an API, set
+          <code className="mx-1 rounded bg-black/30 px-1.5 py-0.5 text-xs">
+            VITE_USE_MOCK=true
+          </code>
+          instead.
         </p>
         <ul className="mt-4 space-y-2 text-sm">
           {missing.map((name) => (

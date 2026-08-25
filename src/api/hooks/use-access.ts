@@ -1,10 +1,10 @@
-import { useAuth } from '@clerk/clerk-react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/api/client'
+import { useSession } from '@/auth/session'
 import type { Access } from '@/types'
 
 export function useAccess() {
-  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const { getToken, isLoaded, isSignedIn } = useSession()
 
   return useQuery({
     queryKey: ['access'],

@@ -1,29 +1,10 @@
-import type { PropertyScope } from '@/types'
+import { mockRequest } from '@/api/mock/handler'
+import { ApiError, type ApiRequestOptions } from '@/api/shared'
+import { isMockMode } from '@/lib/config'
 import { isPropertyAllowed } from '@/types'
 
-export class ApiError extends Error {
-  status: number
-  body: unknown
-
-  constructor(message: string, status: number, body: unknown) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-    this.body = body
-  }
-}
-
-type Primitive = string | number | boolean | null | undefined
-
-export interface ApiRequestOptions {
-  path: string
-  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-  token: string | null
-  scope?: PropertyScope
-  allowedPropertyIds?: string[]
-  body?: unknown
-  searchParams?: Record<string, Primitive>
-}
+export { ApiError } from '@/api/shared'
+export type { ApiRequestOptions } from '@/api/shared'
 
 function apiBaseUrl() {
   const base = import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/$/, '')
@@ -33,7 +14,7 @@ function apiBaseUrl() {
   return base
 }
 
-function scopeParams(scope?: PropertyScope): Record<string, string> {
+function scopeParams(scope?: ApiRequestOptions['scope']): Record<string, string> {
   if (!scope) return {}
   if (scope.type === 'rollup') return { scope: 'rollup' }
   return { scope: 'property', propertyId: scope.propertyId }
@@ -59,6 +40,10 @@ export async function apiRequest<T>(options: ApiRequestOptions): Promise<T> {
       403,
       null,
     )
+  }
+
+  if (isMockMode()) {
+    return mockRequest<T>(options)
   }
 
   const url = new URL(`${apiBaseUrl()}/api/v1${options.path}`)

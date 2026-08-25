@@ -27,20 +27,103 @@ export type PropertyScope =
   | { type: 'rollup' }
   | { type: 'property'; propertyId: string }
 
+export type PeriodKey = 'today' | 'wtd' | 'mtd' | 'ytd'
+
+export type DashboardTab = 'trends' | 'ops'
+
+export interface PeriodWindow {
+  key: PeriodKey
+  from: string
+  to: string
+}
+
+export interface ComparedValue {
+  current: number | null
+  priorPeriod: number | null
+  priorYear: number | null
+}
+
 export interface MetricsSummary {
   propertyId: string | null
-  period: { from: string; to: string }
-  gop: number | null
-  totalRevenue: number | null
-  payrollCost: number | null
+  period: PeriodWindow
   currency: string
+  revenue: ComparedValue
+  rounds: ComparedValue
+  revenuePerRound: ComparedValue
+  utilizationPct: ComparedValue
+  ebitda: ComparedValue
+  gop: ComparedValue
+  laborCost: ComparedValue
+  laborPct: ComparedValue
+  compsPct: ComparedValue
+  leftoverTeeTimeDollars: ComparedValue
+  fbCapturePct: ComparedValue
+  cartAttachPct: ComparedValue
+}
+
+export interface NamedAmount {
+  id: string
+  name: string
+  amount: number
+  sharePct?: number
+  marginPct?: number
+}
+
+export interface MetricsBreakdown {
+  categories: NamedAmount[]
+  segments: NamedAmount[]
+  channels: NamedAmount[]
+  outlets: NamedAmount[]
+}
+
+export interface BudgetRow {
+  metric: 'revenue' | 'rounds' | 'labor'
+  label: string
+  budget: number
+  actual: number
+}
+
+export interface PropertyComparisonRow {
+  propertyId: string
+  propertyName: string
+  rounds: number
+  revenue: number
+  revenuePerRound: number
+  utilizationPct: number
+}
+
+export interface OpportunityItem {
+  id: string
+  title: string
+  detail: string
+  impactDollars: number
+}
+
+export interface MetricsPipeline {
+  advanceRounds: number
+  advanceRevenue: number
+  leagueOutingRevenue: number
+  membershipEnrollmentPct: number
+  membershipRenewalPct: number
+  newGolferPct: number
+  repeatGolferPct: number
+}
+
+export interface CostMargins {
+  laborCost: number
+  laborPct: number
+  proShopMarginPct: number
+  fbMarginPct: number
+  maintenanceSpend: number
+  capexSpend: number
 }
 
 export interface SalesTrendPoint {
   date: string
   revenue: number
-  gop: number
-  payrollCost: number
+  rounds: number
+  utilizationPct: number
+  weatherAdjustedRevenue: number
 }
 
 export interface Sale {
@@ -92,6 +175,7 @@ export interface GridWidgetLayout {
 }
 
 export interface DashboardLayout {
+  tab?: DashboardTab
   widgets: string[]
   layouts: {
     lg: GridWidgetLayout[]

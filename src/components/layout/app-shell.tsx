@@ -1,6 +1,8 @@
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/sidebar'
+import { Badge } from '@/components/ui/badge'
 import { usePropertyScope } from '@/context/property-scope'
+import { isMockMode } from '@/lib/config'
 
 export function AppShell() {
   const { isRollup, selectedProperty, access } = usePropertyScope()
@@ -19,6 +21,9 @@ export function AppShell() {
             </p>
             <p className="text-sm font-medium">{contextLabel}</p>
           </div>
+          {isMockMode() ? (
+            <Badge variant="gold">Demo data</Badge>
+          ) : null}
         </header>
         <main className="min-w-0 flex-1 overflow-auto p-6">
           <Outlet />

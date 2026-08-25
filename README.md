@@ -8,9 +8,23 @@ Frontend-only POS analytics dashboard for golf course operators. The UI never qu
 cp .env.example .env
 ```
 
-Set:
+## Demo mode (no API)
 
-- `VITE_API_BASE_URL` — REST API origin, no trailing slash (example: `https://api.teegle.club`)
+To click around the dashboard with fixture data:
+
+```bash
+cp .env.example .env
+# .env.example already sets VITE_USE_MOCK=true
+npm run dev
+```
+
+`VITE_USE_MOCK=true` skips Clerk and serves `/api/v1` responses from local fixtures in `src/api/mock`. The property switcher still changes figures between Pine Ridge, Mill Creek, and the rollup view.
+
+## Live API
+
+Set `VITE_USE_MOCK=false` (or remove it) and:
+
+- `VITE_API_BASE_URL` — REST API origin, no trailing slash
 - `VITE_CLERK_PUBLISHABLE_KEY` — Clerk publishable key
 
 ```bash

@@ -6,3 +6,11 @@ export {
   useDashboardLayout,
   useSaveDashboardLayout,
 } from './use-dashboard-layout'
+export {
+  useBreakdown,
+  useBudget,
+  useComparison,
+  useCosts,
+  useOpportunities,
+  usePipeline,
+} from './use-dashboard-metrics'

@@ -1,12 +1,12 @@
-import { useAuth } from '@clerk/clerk-react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/api/client'
+import { useSession } from '@/auth/session'
 import { usePropertyScope } from '@/context/property-scope'
 import type { Customer, CustomerProfile, Paginated } from '@/types'
 import { scopeKey } from '@/types'
 
 export function useCustomers(page = 1, pageSize = 50) {
-  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const { getToken, isLoaded, isSignedIn } = useSession()
   const { scope, allowedPropertyIds } = usePropertyScope()
 
   return useQuery({
@@ -26,7 +26,7 @@ export function useCustomers(page = 1, pageSize = 50) {
 }
 
 export function useCustomer(customerId: string | undefined) {
-  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const { getToken, isLoaded, isSignedIn } = useSession()
   const { scope, allowedPropertyIds } = usePropertyScope()
 
   return useQuery({

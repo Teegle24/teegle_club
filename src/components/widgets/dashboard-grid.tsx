@@ -12,25 +12,38 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
-  DEFAULT_WIDGET_IDS,
+  DEFAULT_WIDGETS,
   defaultLayouts,
-  WIDGET_CATALOG,
   widgetById,
+  widgetsForTab,
   type WidgetId,
 } from '@/components/widgets/catalog'
-import { KpiWidget } from '@/components/widgets/kpi-widget'
+import { BreakdownWidget } from '@/components/widgets/breakdown-widget'
+import { BudgetWidget } from '@/components/widgets/budget-widget'
+import { ComparedKpiWidget } from '@/components/widgets/compared-kpi'
+import { ComparisonWidget } from '@/components/widgets/comparison-widget'
+import { OpportunityWidget } from '@/components/widgets/opportunity-widget'
 import { RecentSalesWidget } from '@/components/widgets/recent-sales-widget'
-import { TrendWidget } from '@/components/widgets/trend-widget'
+import {
+  BookingPaceWidget,
+  CaptureWidget,
+  CostsWidget,
+  LeagueWidget,
+  MaintenanceWidget,
+  MembershipWidget,
+  NewRepeatWidget,
+} from '@/components/widgets/stat-widgets'
+import { UtilizationWidget, YoyTrendWidget } from '@/components/widgets/trend-widget'
 import { WidgetFrame } from '@/components/widgets/widget-frame'
 import { WidgetLoading } from '@/components/widget-states'
-import type { DashboardLayout, GridWidgetLayout } from '@/types'
+import type { DashboardLayout, DashboardTab, GridWidgetLayout } from '@/types'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
-function isWidgetId(id: string): id is WidgetId {
-  return WIDGET_CATALOG.some((widget) => widget.id === id)
+function isWidgetId(id: string, tab: DashboardTab): id is WidgetId {
+  return widgetsForTab(tab).some((widget) => widget.id === id)
 }
 
 function toGrid(items: GridWidgetLayout[]): Layout[] {
@@ -58,20 +71,72 @@ function fromGrid(items: Layout[]): GridWidgetLayout[] {
 }
 
 function renderWidget(id: WidgetId) {
-  if (id === 'gop') return <KpiWidget metric="gop" />
-  if (id === 'revenue') return <KpiWidget metric="totalRevenue" />
-  if (id === 'payroll') return <KpiWidget metric="payrollCost" />
-  if (id === 'trend') return <TrendWidget />
-  return <RecentSalesWidget />
+  switch (id) {
+    case 'yoy-trend':
+      return <YoyTrendWidget />
+    case 'weather':
+      return <YoyTrendWidget weather />
+    case 'budget':
+      return <BudgetWidget />
+    case 'ebitda':
+      return <ComparedKpiWidget metric="ebitda" format="money" />
+    case 'gop':
+      return <ComparedKpiWidget metric="gop" format="money" />
+    case 'comparison':
+      return <ComparisonWidget />
+    case 'booking-pace':
+      return <BookingPaceWidget />
+    case 'opportunities':
+      return <OpportunityWidget />
+    case 'comps':
+      return <ComparedKpiWidget metric="compsPct" format="percent" invert />
+    case 'leftover':
+      return <ComparedKpiWidget metric="leftoverTeeTimeDollars" format="money" invert />
+    case 'category':
+      return <BreakdownWidget field="categories" />
+    case 'segment':
+      return <BreakdownWidget field="segments" />
+    case 'channel':
+      return <BreakdownWidget field="channels" format="number" />
+    case 'outlets':
+      return <BreakdownWidget field="outlets" showMargin />
+    case 'utilization':
+      return <UtilizationWidget />
+    case 'labor-pct':
+      return <ComparedKpiWidget metric="laborPct" format="percent" invert />
+    case 'cogs':
+      return <CostsWidget />
+    case 'capture':
+      return <CaptureWidget />
+    case 'new-repeat':
+      return <NewRepeatWidget />
+    case 'membership':
+      return <MembershipWidget />
+    case 'league':
+      return <LeagueWidget />
+    case 'maintenance':
+      return <MaintenanceWidget />
+    case 'recent-sales':
+      return <RecentSalesWidget />
+    default:
+      return null
+  }
 }
 
-export function DashboardGrid() {
-  const layoutQuery = useDashboardLayout()
-  const saveLayout = useSaveDashboardLayout()
-  const [widgetIds, setWidgetIds] = useState<WidgetId[]>(DEFAULT_WIDGET_IDS)
-  const [layouts, setLayouts] = useState<Layouts>(defaultLayouts())
+export function DashboardGrid({ tab }: { tab: DashboardTab }) {
+  const layoutQuery = useDashboardLayout(tab)
+  const saveLayout = useSaveDashboardLayout(tab)
+  const catalog = widgetsForTab(tab)
+  const [widgetIds, setWidgetIds] = useState<WidgetId[]>(DEFAULT_WIDGETS[tab])
+  const [layouts, setLayouts] = useState<Layouts>(defaultLayouts(tab))
   const hydrated = useRef(false)
   const saveTimer = useRef<number | null>(null)
+
+  useEffect(() => {
+    hydrated.current = false
+    setWidgetIds(DEFAULT_WIDGETS[tab])
+    setLayouts(defaultLayouts(tab))
+  }, [tab])
 
   useEffect(() => {
     if (layoutQuery.isError) {
@@ -81,22 +146,26 @@ export function DashboardGrid() {
     if (!layoutQuery.isSuccess) return
     const remote = layoutQuery.data
     if (remote?.widgets?.length && remote.layouts?.lg) {
-      setWidgetIds(remote.widgets.filter(isWidgetId))
+      const nextIds = remote.widgets.filter((id): id is WidgetId =>
+        isWidgetId(id, tab),
+      )
+      setWidgetIds(nextIds.length ? nextIds : DEFAULT_WIDGETS[tab])
       setLayouts({
         lg: toGrid(remote.layouts.lg),
         md: toGrid(remote.layouts.md ?? remote.layouts.lg),
         sm: toGrid(remote.layouts.sm ?? remote.layouts.lg),
       })
     } else {
-      setWidgetIds(DEFAULT_WIDGET_IDS)
-      setLayouts(defaultLayouts())
+      setWidgetIds(DEFAULT_WIDGETS[tab])
+      setLayouts(defaultLayouts(tab))
     }
     hydrated.current = true
-  }, [layoutQuery.data, layoutQuery.isError, layoutQuery.isSuccess])
+  }, [layoutQuery.data, layoutQuery.isError, layoutQuery.isSuccess, tab])
 
   const persist = (nextIds: WidgetId[], nextLayouts: Layouts) => {
     if (!hydrated.current) return
     const payload: DashboardLayout = {
+      tab,
       widgets: nextIds,
       layouts: {
         lg: fromGrid(nextLayouts.lg ?? []),
@@ -145,8 +214,8 @@ export function DashboardGrid() {
   }
 
   const available = useMemo(
-    () => WIDGET_CATALOG.filter((widget) => !widgetIds.includes(widget.id)),
-    [widgetIds],
+    () => catalog.filter((widget) => !widgetIds.includes(widget.id)),
+    [catalog, widgetIds],
   )
 
   if (layoutQuery.isPending) {
@@ -175,9 +244,11 @@ export function DashboardGrid() {
               Add widget
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64">
-            <DropdownMenuLabel>Dashboard widgets</DropdownMenuLabel>
-            {WIDGET_CATALOG.map((widget) => (
+          <DropdownMenuContent align="end" className="max-h-80 w-72 overflow-auto">
+            <DropdownMenuLabel>
+              {tab === 'trends' ? 'Trends & budget' : 'Ops detail'}
+            </DropdownMenuLabel>
+            {catalog.map((widget) => (
               <DropdownMenuCheckboxItem
                 key={widget.id}
                 checked={widgetIds.includes(widget.id)}
@@ -195,7 +266,7 @@ export function DashboardGrid() {
 
       {widgetIds.length === 0 ? (
         <div className="flex min-h-64 items-center justify-center rounded-xl border border-dashed border-border bg-card/40 text-sm text-muted-foreground">
-          No widgets on this dashboard.
+          No widgets on this view.
           {available[0] ? (
             <Button
               className="ml-3"

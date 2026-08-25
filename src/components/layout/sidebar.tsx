@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
 import { Flag, LayoutDashboard, Receipt, Users } from 'lucide-react'
 import { PropertySwitcher } from '@/components/layout/property-switcher'
+import { isMockMode } from '@/lib/config'
 import { cn } from '@/lib/utils'
 
 const NAV = [
@@ -53,16 +54,24 @@ export function Sidebar() {
       </nav>
 
       <div className="flex items-center gap-3 border-t border-white/10 px-4 py-4">
-        <UserButton
-          appearance={{
-            elements: {
-              avatarBox: 'h-8 w-8',
-            },
-          }}
-        />
+        {isMockMode() ? (
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-xs font-medium text-accent-foreground">
+            DG
+          </span>
+        ) : (
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: 'h-8 w-8',
+              },
+            }}
+          />
+        )}
         <div className="min-w-0">
-          <p className="truncate text-sm">Account</p>
-          <p className="truncate text-[11px] text-sidebar-muted">Signed in</p>
+          <p className="truncate text-sm">{isMockMode() ? 'Demo guest' : 'Account'}</p>
+          <p className="truncate text-[11px] text-sidebar-muted">
+            {isMockMode() ? 'Local mock data' : 'Signed in'}
+          </p>
         </div>
       </div>
     </aside>
