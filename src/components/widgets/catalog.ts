@@ -1,5 +1,6 @@
 import type {
   ComparedMetricKey,
+  GridWidgetLayout,
   MetricCategory,
   MetricTier,
   MetricsBreakdown,
@@ -795,8 +796,51 @@ export function defaultLayouts(widgetIds?: WidgetId[]) {
 }
 
 export function packDetailLayouts(detailIds: WidgetId[]) {
-  const lg = packWidgets(detailIds, (id) => widgetById(id)?.sizeTier ?? 'md')
+  const lg = packDetailByCategory(detailIds)
   return { lg, md: lg, sm: lg }
+}
+
+export function packDetailByCategory(detailIds: WidgetId[]): GridWidgetLayout[] {
+  const grouped = groupDetailByCategory(detailIds)
+  let y = 0
+  const placed: GridWidgetLayout[] = []
+
+  for (const { ids } of grouped) {
+    const packed = packWidgets(ids, (id) => widgetById(id)?.sizeTier ?? 'md')
+    for (const item of packed) {
+      placed.push({ ...item, y: item.y + y })
+    }
+    if (packed.length > 0) {
+      y += Math.max(...packed.map((item) => item.y + item.h))
+    }
+  }
+
+  return placed
+}
+
+export function groupDetailByCategory(detailIds: WidgetId[]) {
+  const order = new Map(detailIds.map((id, index) => [id, index]))
+  const groups = new Map<MetricCategory, WidgetId[]>()
+
+  for (const id of detailIds) {
+    const widget = widgetById(id)
+    if (!widget || widget.tier !== 'det') continue
+    const list = groups.get(widget.category) ?? []
+    list.push(id)
+    groups.set(widget.category, list)
+  }
+
+  return CATEGORIES.filter((category) => groups.has(category.id)).map((category) => ({
+    category: category.id,
+    label: category.label,
+    ids: (groups.get(category.id) ?? []).sort(
+      (a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0),
+    ),
+  }))
+}
+
+export function categoryLabel(category: MetricCategory) {
+  return CATEGORIES.find((item) => item.id === category)?.label ?? category
 }
 
 export function splitWidgetIds(ids: WidgetId[]) {

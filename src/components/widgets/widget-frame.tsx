@@ -1,29 +1,56 @@
 import type { ReactNode } from 'react'
-import { GripVertical, X } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { ChevronRight, X } from 'lucide-react'
+import type { WidgetId } from '@/components/widgets/catalog'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 export function WidgetFrame({
+  widgetId,
   title,
   eyebrow,
   onRemove,
   children,
   className,
-  draggable = true,
   featured = false,
+  interactive = true,
+  showRemove = true,
 }: {
+  widgetId: WidgetId
   title: string
   eyebrow?: string
-  onRemove: () => void
+  onRemove?: () => void
   children: ReactNode
   className?: string
-  draggable?: boolean
   featured?: boolean
+  interactive?: boolean
+  showRemove?: boolean
 }) {
+  const navigate = useNavigate()
+
+  const openDetail = () => {
+    if (!interactive) return
+    navigate(`/metrics/${widgetId}`)
+  }
+
   return (
     <section
+      role={interactive ? 'button' : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      onClick={interactive ? openDetail : undefined}
+      onKeyDown={
+        interactive
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                openDetail()
+              }
+            }
+          : undefined
+      }
       className={cn(
-        'relative flex h-full flex-col overflow-hidden rounded-md border shadow-sm',
+        'group relative flex h-full flex-col overflow-hidden rounded-md border shadow-sm transition-shadow',
+        interactive && 'cursor-pointer hover:shadow-md',
         featured
           ? 'border-brand/25 bg-navy text-white shadow-brand/10'
           : 'border-border/80 bg-card text-card-foreground',
@@ -42,20 +69,6 @@ export function WidgetFrame({
           featured ? 'border-white/10' : 'border-border/60 bg-canvas-2/50',
         )}
       >
-        {draggable ? (
-          <button
-            type="button"
-            className={cn(
-              'widget-drag-handle flex h-6 w-6 cursor-grab items-center justify-center rounded active:cursor-grabbing',
-              featured ? 'text-white/50 hover:text-white/80' : 'text-ink-soft/70 hover:text-ink',
-            )}
-            aria-label={`Move ${title}`}
-          >
-            <GripVertical className="h-3.5 w-3.5" />
-          </button>
-        ) : (
-          <span className="h-6 w-6 shrink-0" />
-        )}
         <div className="min-w-0 flex-1">
           {eyebrow ? (
             <p
@@ -76,19 +89,33 @@ export function WidgetFrame({
             {title}
           </h2>
         </div>
-        <Button
-          type="button"
-          size="icon"
-          variant="ghost"
-          className={cn(
-            'h-6 w-6',
-            featured ? 'text-white/60 hover:bg-white/10 hover:text-white' : 'text-ink-soft',
-          )}
-          onClick={onRemove}
-          aria-label={`Remove ${title}`}
-        >
-          <X className="h-3.5 w-3.5" />
-        </Button>
+        {interactive ? (
+          <ChevronRight
+            className={cn(
+              'mr-1 h-3.5 w-3.5 shrink-0 opacity-40 transition-opacity group-hover:opacity-100',
+              featured ? 'text-white/40' : 'text-ink-soft/60',
+            )}
+            aria-hidden
+          />
+        ) : null}
+        {showRemove && onRemove ? (
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className={cn(
+              'h-6 w-6',
+              featured ? 'text-white/60 hover:bg-white/10 hover:text-white' : 'text-ink-soft',
+            )}
+            onClick={(event) => {
+              event.stopPropagation()
+              onRemove()
+            }}
+            aria-label={`Remove ${title}`}
+          >
+            <X className="h-3.5 w-3.5" />
+          </Button>
+        ) : null}
       </header>
       <div className="min-h-0 flex-1 px-4 pb-4 pt-3">{children}</div>
     </section>

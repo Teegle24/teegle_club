@@ -1,9 +1,11 @@
 import { PeriodPicker } from '@/components/dashboard/period-picker'
 import { DashboardGrid } from '@/components/widgets/dashboard-grid'
+import { useDashboardWidgetsContext } from '@/context/dashboard-widgets'
 import { usePropertyScope } from '@/context/property-scope'
 
 export function DashboardPage() {
   const { isRollup, selectedProperty } = usePropertyScope()
+  const { widgetIds, removeWidget, resetLayout, isPending } = useDashboardWidgetsContext()
 
   return (
     <div className="grain relative">
@@ -24,7 +26,13 @@ export function DashboardPage() {
         </div>
         <PeriodPicker />
       </div>
-      <DashboardGrid />
+
+      <DashboardGrid
+        widgetIds={widgetIds}
+        onRemove={removeWidget}
+        resetLayout={resetLayout}
+        isPending={isPending}
+      />
     </div>
   )
 }

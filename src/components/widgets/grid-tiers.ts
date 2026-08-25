@@ -13,6 +13,22 @@ export const SIZE_TIERS: Record<
   full: { w: 12, h: 8, label: 'Full width', perRow: 1 },
 }
 
+export const COL_SPAN: Record<number, string> = {
+  2: 'lg:col-span-2',
+  3: 'lg:col-span-3',
+  4: 'lg:col-span-4',
+  6: 'lg:col-span-6',
+  12: 'col-span-12',
+}
+
+export const TILE_MIN_HEIGHT: Record<SizeTier, string> = {
+  sm: 'min-h-[8rem]',
+  md: 'min-h-[9.5rem]',
+  lg: 'min-h-[10rem]',
+  half: 'min-h-[14rem]',
+  full: 'min-h-[18rem]',
+}
+
 export function lockedLayout(id: string, tier: SizeTier): GridWidgetLayout {
   const { w, h } = SIZE_TIERS[tier]
   return {
