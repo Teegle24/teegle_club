@@ -49,9 +49,9 @@
 
 :root {
   --radius: 0.375rem;
-  --canvas: #f2f5f3;
-  --canvas-2: #e8eeeb;
-  --canvas-3: #d4ddd8;
+  --canvas: #f7fcf9;
+  --canvas-2: #eef8f3;
+  --canvas-3: #dceee4;
   --ink: #0f1714;
   --ink-soft: #4a5c55;
   --navy: #0c1f19;
@@ -76,12 +76,12 @@
   --accent: var(--brand);
   --accent-foreground: #f4faf7;
   --destructive: #b42318;
-  --border: #d5ddd8;
-  --input: #c8d3cd;
+  --border: #d7e8de;
+  --input: #c5d9cf;
   --ring: var(--brand);
-  --sidebar: var(--navy);
-  --sidebar-foreground: #eceeed;
-  --sidebar-muted: #8b9a94;
+  --sidebar: var(--canvas);
+  --sidebar-foreground: var(--ink);
+  --sidebar-muted: var(--ink-soft);
   --chart-1: var(--brand);
   --chart-2: var(--steel);
   --chart-3: #0f766e;

@@ -14,7 +14,7 @@ export function AppShell() {
     <div className="flex min-h-svh bg-background">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-12 items-center justify-between border-b border-border bg-card px-6">
+        <header className="flex h-12 items-center justify-between border-b border-border/80 bg-background px-6">
           <p className="text-[13px] text-muted-foreground">
             <span className="text-foreground">{access?.organization.name ?? 'Teegle Club'}</span>
             <span className="mx-2 text-border">/</span>

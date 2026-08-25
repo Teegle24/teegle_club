@@ -22,7 +22,7 @@ export function PropertySwitcher() {
   } = usePropertyScope()
 
   if (isLoading) {
-    return <Skeleton className="h-9 w-full bg-white/10" />
+    return <Skeleton className="h-9 w-full bg-muted" />
   }
 
   if (error) {
@@ -30,7 +30,7 @@ export function PropertySwitcher() {
       <button
         type="button"
         onClick={refetch}
-        className="w-full rounded-md border border-white/15 px-3 py-2 text-left text-xs text-red-300"
+        className="w-full rounded-md border border-border px-3 py-2 text-left text-xs text-destructive"
       >
         Couldn’t load courses. Retry
       </button>
@@ -39,7 +39,7 @@ export function PropertySwitcher() {
 
   if (!access || properties.length === 0) {
     return (
-      <p className="rounded-md border border-white/10 px-3 py-2 text-xs text-sidebar-muted">
+      <p className="rounded-md border border-border px-3 py-2 text-xs text-sidebar-muted">
         No courses linked to this account.
       </p>
     )
@@ -62,7 +62,7 @@ export function PropertySwitcher() {
           setScope({ type: 'property', propertyId: next })
         }}
       >
-        <SelectTrigger className="h-9 border-white/15 bg-white/5 text-sidebar-foreground hover:bg-white/10">
+        <SelectTrigger className="h-9 border-border bg-card text-sidebar-foreground hover:bg-canvas-2">
           <SelectValue placeholder="Select a course" />
         </SelectTrigger>
         <SelectContent>

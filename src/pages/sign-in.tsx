@@ -14,9 +14,11 @@ export function SignInPage() {
       </SignedIn>
       <SignedOut>
         <div className="flex min-h-svh flex-col items-center justify-center bg-background px-4">
-          <p className="mb-6 text-xl font-semibold tracking-tight">
-            Teegle Club
-          </p>
+          <img
+            src="/teegle-club-logo.png"
+            alt="Teegle Club"
+            className="mb-8 h-20 w-auto max-w-[280px] object-contain"
+          />
           <SignIn
             routing="path"
             path="/sign-in"

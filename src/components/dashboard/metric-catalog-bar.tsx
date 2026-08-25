@@ -31,7 +31,7 @@ export function MetricCatalogBar({
     <div
       className={cn(
         isSidebar
-          ? 'border-t border-white/10 px-2 py-3'
+          ? 'border-t border-border px-2 py-3'
           : 'mb-8 rounded-md border border-border/80 bg-card p-3 shadow-sm',
       )}
     >
@@ -60,8 +60,8 @@ export function MetricCatalogBar({
                       : 'inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-[13px] transition-colors',
                     isSidebar
                       ? count > 0
-                        ? 'bg-white/10 text-white'
-                        : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
+                        ? 'bg-brand/15 font-medium text-brand'
+                        : 'text-sidebar-muted hover:bg-canvas-2 hover:text-sidebar-foreground'
                       : count > 0
                         ? 'border-brand/30 bg-brand/5 text-ink'
                         : 'border-border bg-canvas-2/40 text-ink-soft hover:border-border hover:bg-canvas-2 hover:text-ink',
@@ -73,7 +73,7 @@ export function MetricCatalogBar({
                       className={cn(
                         'tabular-nums',
                         isSidebar
-                          ? 'text-[11px] text-ice/90'
+                          ? 'text-[11px] text-brand'
                           : 'rounded-full bg-brand px-1.5 text-[10px] font-semibold text-primary-foreground',
                       )}
                     >
