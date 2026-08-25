@@ -1,0 +1,10 @@
+---
+description: After committing, always push to the remote
+alwaysApply: true
+---
+
+# Always push after commit
+
+When you create a git commit in this repo, immediately `git push` the current branch to origin (with `-u` if it has no upstream). Do not wait for a separate "push" request.
+
+Do not force-push unless the user explicitly asks.
