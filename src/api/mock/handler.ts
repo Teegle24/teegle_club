@@ -19,7 +19,7 @@ import {
 } from '@/api/mock/snapshot'
 import type { DashboardLayout, Paginated, PeriodKey, PropertyScope, Sale } from '@/types'
 
-const LAYOUT_KEY = 'teegle-club.mock.dashboard-layout.v3'
+const LAYOUT_KEY = 'teegle-club.mock.dashboard-layout.v4'
 
 function delay(ms = 140) {
   return new Promise((resolve) => window.setTimeout(resolve, ms))

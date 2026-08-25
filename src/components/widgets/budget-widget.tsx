@@ -5,6 +5,7 @@ import {
   WidgetLoading,
 } from '@/components/widget-states'
 import { formatMoney, formatNumber, formatPercent } from '@/lib/format'
+import { cn } from '@/lib/utils'
 import type { BudgetRow } from '@/types'
 
 function display(metric: BudgetRow['metric'], value: number) {
@@ -12,7 +13,7 @@ function display(metric: BudgetRow['metric'], value: number) {
   return formatMoney(value)
 }
 
-export function BudgetWidget() {
+export function BudgetWidget({ dark = false }: { dark?: boolean }) {
   const query = useBudget()
 
   if (query.isLoading) return <WidgetLoading />
@@ -38,22 +39,38 @@ export function BudgetWidget() {
         return (
           <li key={row.metric}>
             <div className="mb-1 flex items-baseline justify-between text-sm">
-              <span className="text-muted-foreground">{row.label}</span>
+              <span className={cn(dark ? 'text-white/60' : 'text-muted-foreground')}>
+                {row.label}
+              </span>
               <span className="tabular-nums">
                 {display(row.metric, row.actual)}
-                <span className="text-muted-foreground">
+                <span className={cn(dark ? 'text-white/50' : 'text-muted-foreground')}>
                   {' '}
                   / {display(row.metric, row.budget)}
                 </span>
               </span>
             </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+            <div
+              className={cn(
+                'h-1.5 overflow-hidden rounded-full',
+                dark ? 'bg-white/10' : 'bg-muted',
+              )}
+            >
               <div
-                className={`h-full rounded-full ${bad ? 'bg-destructive/80' : 'bg-primary'}`}
+                className={cn(
+                  'h-full rounded-full',
+                  bad
+                    ? dark
+                      ? 'bg-red-300'
+                      : 'bg-destructive/80'
+                    : dark
+                      ? 'bg-brand-2'
+                      : 'bg-primary',
+                )}
                 style={{ width: `${Math.min(pct, 100)}%` }}
               />
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className={cn('mt-1 text-[11px]', dark ? 'text-white/50' : 'text-muted-foreground')}>
               {formatPercent(pct, 0)} of budget
             </p>
           </li>

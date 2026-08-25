@@ -6,13 +6,19 @@ export function DashboardPage() {
   const { isRollup, selectedProperty } = usePropertyScope()
 
   return (
-    <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div className="grain relative">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
+          <div className="mb-2 flex items-center gap-2.5">
+            <span className="h-px w-6 bg-brand" />
+            <span className="label text-brand">Overview</span>
+          </div>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-ink">
+            Dashboard
+          </h1>
+          <p className="mt-1 text-sm text-ink-soft">
             {isRollup
-              ? 'High-level view across linked properties. Add detail from the list on the left.'
+              ? 'High-level view across linked properties.'
               : selectedProperty?.name}
           </p>
         </div>

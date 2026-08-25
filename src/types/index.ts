@@ -319,7 +319,11 @@ export interface GridWidgetLayout {
   h: number
   minW?: number
   minH?: number
+  maxW?: number
+  maxH?: number
 }
+
+export type SizeTier = 'sm' | 'md' | 'lg' | 'half' | 'full'
 
 export interface DashboardLayout {
   widgets: string[]

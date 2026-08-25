@@ -25,10 +25,8 @@ export function MetricCatalogBar({
   const selectedSet = useMemo(() => new Set(selected), [selected])
 
   return (
-    <aside className="w-40 shrink-0">
-      <p className="mb-2 px-2 text-[11px] font-medium text-muted-foreground">
-        Add metrics
-      </p>
+    <aside className="w-44 shrink-0 rounded-md border border-border/80 bg-card p-2 shadow-sm">
+      <p className="label mb-2 px-1 text-brand">Add metrics</p>
       <nav className="flex flex-col gap-px">
         {CATEGORIES.map((category) => {
           const widgets = widgetsByCategory(category.id)
@@ -41,26 +39,24 @@ export function MetricCatalogBar({
                 <button
                   type="button"
                   className={cn(
-                    'flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] text-muted-foreground hover:bg-muted hover:text-foreground',
-                    count > 0 && 'text-foreground',
+                    'flex h-8 w-full items-center gap-2 rounded px-2 text-left text-[13px] text-ink-soft transition-colors hover:bg-canvas-2 hover:text-ink',
+                    count > 0 && 'bg-canvas-2/60 font-medium text-ink',
                   )}
                 >
                   <span className="min-w-0 flex-1 truncate">{category.label}</span>
                   {count > 0 ? (
-                    <span className="tabular-nums text-[11px] text-muted-foreground">
-                      {count}
-                    </span>
+                    <span className="tabular-nums text-[11px] text-brand">{count}</span>
                   ) : null}
-                  <ChevronRight className="h-3 w-3 shrink-0 opacity-50" />
+                  <ChevronRight className="h-3 w-3 shrink-0 opacity-40" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 side="right"
                 align="start"
-                sideOffset={6}
+                sideOffset={8}
                 className="max-h-80 w-64 overflow-auto"
               >
-                <DropdownMenuLabel>High-level</DropdownMenuLabel>
+                <DropdownMenuLabel className="label text-brand">High-level</DropdownMenuLabel>
                 {high.map((widget) => (
                   <DropdownMenuCheckboxItem
                     key={widget.id}
@@ -74,7 +70,7 @@ export function MetricCatalogBar({
                 {detail.length > 0 ? (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuLabel>Detail</DropdownMenuLabel>
+                    <DropdownMenuLabel className="label text-ink-soft">Detail</DropdownMenuLabel>
                     {detail.map((widget) => (
                       <DropdownMenuCheckboxItem
                         key={widget.id}

@@ -1,11 +1,12 @@
 import type {
   ComparedMetricKey,
-  GridWidgetLayout,
   MetricCategory,
   MetricTier,
   MetricsBreakdown,
   OpsMetrics,
+  SizeTier,
 } from '@/types'
+import { packWidgets } from '@/components/widgets/grid-tiers'
 
 export type WidgetId =
   | 'revenue'
@@ -128,7 +129,7 @@ export interface WidgetDefinition {
   category: MetricCategory
   tier: MetricTier
   render: WidgetKind
-  default: GridWidgetLayout
+  sizeTier: SizeTier
 }
 
 export const CATEGORIES: { id: MetricCategory; label: string }[] = [
@@ -144,18 +145,6 @@ export const CATEGORIES: { id: MetricCategory; label: string }[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-function kpi(id: WidgetId, x = 0, y = 0): GridWidgetLayout {
-  return { i: id, x, y, w: 3, h: 5, minW: 2, minH: 4 }
-}
-
-function chart(id: WidgetId): GridWidgetLayout {
-  return { i: id, x: 0, y: 0, w: 6, h: 8, minW: 4, minH: 6 }
-}
-
-function wide(id: WidgetId): GridWidgetLayout {
-  return { i: id, x: 0, y: 0, w: 8, h: 9, minW: 5, minH: 7 }
-}
-
 export const WIDGET_CATALOG: WidgetDefinition[] = [
   {
     id: 'revenue',
@@ -164,7 +153,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'revenue',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'revenue', format: 'money' },
-    default: kpi('revenue', 0, 0),
+    sizeTier: 'md',
   },
   {
     id: 'revenue-per-round',
@@ -173,7 +162,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'revenue',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'revenuePerRound', format: 'money' },
-    default: kpi('revenue-per-round', 6, 0),
+    sizeTier: 'md',
   },
   {
     id: 'leftover',
@@ -182,7 +171,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'revenue',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'leftoverTeeTimeDollars', format: 'money', invert: true },
-    default: { i: 'leftover', x: 4, y: 5, w: 4, h: 5, minW: 2, minH: 4 },
+    sizeTier: 'md',
   },
   {
     id: 'category',
@@ -191,7 +180,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'revenue',
     tier: 'det',
     render: { kind: 'breakdown', field: 'categories' },
-    default: chart('category'),
+    sizeTier: 'half',
   },
   {
     id: 'segment',
@@ -200,7 +189,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'revenue',
     tier: 'det',
     render: { kind: 'breakdown', field: 'segments' },
-    default: chart('segment'),
+    sizeTier: 'half',
   },
   {
     id: 'channel-revenue',
@@ -209,7 +198,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'revenue',
     tier: 'det',
     render: { kind: 'breakdown', field: 'channels', format: 'number' },
-    default: chart('channel-revenue'),
+    sizeTier: 'half',
   },
   {
     id: 'comps',
@@ -218,7 +207,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'revenue',
     tier: 'det',
     render: { kind: 'comps' },
-    default: kpi('comps'),
+    sizeTier: 'md',
   },
   {
     id: 'atv-shop',
@@ -227,7 +216,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'revenue',
     tier: 'det',
     render: { kind: 'kpi', metric: 'avgCheckShop', format: 'money' },
-    default: kpi('atv-shop'),
+    sizeTier: 'md',
   },
   {
     id: 'atv-fb',
@@ -236,7 +225,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'revenue',
     tier: 'det',
     render: { kind: 'kpi', metric: 'avgCheckFb', format: 'money' },
-    default: kpi('atv-fb'),
+    sizeTier: 'md',
   },
   {
     id: 'rounds',
@@ -245,7 +234,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'tee-sheet',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'rounds', format: 'number' },
-    default: kpi('rounds', 3, 0),
+    sizeTier: 'md',
   },
   {
     id: 'utilization',
@@ -254,7 +243,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'tee-sheet',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'utilizationPct', format: 'percent' },
-    default: kpi('utilization', 9, 0),
+    sizeTier: 'md',
   },
   {
     id: 'util-time-block',
@@ -263,7 +252,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'tee-sheet',
     tier: 'det',
     render: { kind: 'breakdown', field: 'timeBlocks', format: 'percent' },
-    default: chart('util-time-block'),
+    sizeTier: 'half',
   },
   {
     id: 'util-dow',
@@ -272,7 +261,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'tee-sheet',
     tier: 'det',
     render: { kind: 'breakdown', field: 'dayOfWeek', format: 'percent' },
-    default: chart('util-dow'),
+    sizeTier: 'half',
   },
   {
     id: 'booking-lead',
@@ -281,7 +270,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'tee-sheet',
     tier: 'det',
     render: { kind: 'lead-trend' },
-    default: chart('booking-lead'),
+    sizeTier: 'half',
   },
   {
     id: 'booking-pace',
@@ -290,7 +279,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'tee-sheet',
     tier: 'det',
     render: { kind: 'pace-windows' },
-    default: chart('booking-pace'),
+    sizeTier: 'half',
   },
   {
     id: 'tee-heatmap',
@@ -299,7 +288,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'tee-sheet',
     tier: 'det',
     render: { kind: 'heatmap' },
-    default: wide('tee-heatmap'),
+    sizeTier: 'full',
   },
   {
     id: 'golfer-type',
@@ -308,7 +297,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'tee-sheet',
     tier: 'det',
     render: { kind: 'breakdown', field: 'golferTypes', format: 'number' },
-    default: chart('golfer-type'),
+    sizeTier: 'half',
   },
   {
     id: 'no-shows',
@@ -317,7 +306,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'tee-sheet',
     tier: 'det',
     render: { kind: 'no-shows' },
-    default: kpi('no-shows'),
+    sizeTier: 'md',
   },
   {
     id: 'rebooking',
@@ -326,7 +315,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'tee-sheet',
     tier: 'det',
     render: { kind: 'kpi', metric: 'rebookingRate', format: 'percent' },
-    default: kpi('rebooking'),
+    sizeTier: 'md',
   },
   {
     id: 'booking-mix',
@@ -335,7 +324,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'tee-sheet',
     tier: 'det',
     render: { kind: 'mix-trend' },
-    default: wide('booking-mix'),
+    sizeTier: 'full',
   },
   {
     id: 'fb-revenue',
@@ -344,7 +333,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'fb',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'fbRevenue', format: 'money' },
-    default: kpi('fb-revenue'),
+    sizeTier: 'md',
   },
   {
     id: 'fb-attach',
@@ -353,7 +342,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'fb',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'fbCapturePct', format: 'percent' },
-    default: kpi('fb-attach'),
+    sizeTier: 'md',
   },
   {
     id: 'fb-top',
@@ -362,7 +351,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'fb',
     tier: 'det',
     render: { kind: 'ranking', field: 'topFbItems' },
-    default: chart('fb-top'),
+    sizeTier: 'half',
   },
   {
     id: 'fb-slow',
@@ -371,7 +360,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'fb',
     tier: 'det',
     render: { kind: 'ranking', field: 'slowFbItems' },
-    default: chart('fb-slow'),
+    sizeTier: 'half',
   },
   {
     id: 'fb-category',
@@ -380,7 +369,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'fb',
     tier: 'det',
     render: { kind: 'breakdown', field: 'fbCategories' },
-    default: chart('fb-category'),
+    sizeTier: 'half',
   },
   {
     id: 'avg-check-fb',
@@ -389,7 +378,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'fb',
     tier: 'det',
     render: { kind: 'kpi', metric: 'avgCheckFb', format: 'money' },
-    default: kpi('avg-check-fb'),
+    sizeTier: 'md',
   },
   {
     id: 'fb-daypart',
@@ -398,7 +387,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'fb',
     tier: 'det',
     render: { kind: 'breakdown', field: 'fbDayparts' },
-    default: chart('fb-daypart'),
+    sizeTier: 'half',
   },
   {
     id: 'food-cost',
@@ -407,7 +396,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'fb',
     tier: 'det',
     render: { kind: 'kpi', metric: 'foodCostPct', format: 'percent', invert: true },
-    default: kpi('food-cost'),
+    sizeTier: 'md',
   },
   {
     id: 'waste',
@@ -416,7 +405,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'fb',
     tier: 'det',
     render: { kind: 'kpi', metric: 'wasteDollars', format: 'money', invert: true },
-    default: kpi('waste'),
+    sizeTier: 'md',
   },
   {
     id: 'fb-stock',
@@ -425,7 +414,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'fb',
     tier: 'det',
     render: { kind: 'ranking', field: 'lowStock' },
-    default: chart('fb-stock'),
+    sizeTier: 'half',
   },
   {
     id: 'shop-revenue',
@@ -434,7 +423,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'pro-shop',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'proShopRevenue', format: 'money' },
-    default: kpi('shop-revenue'),
+    sizeTier: 'md',
   },
   {
     id: 'shop-top',
@@ -443,7 +432,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'pro-shop',
     tier: 'det',
     render: { kind: 'ranking', field: 'topShopItems' },
-    default: chart('shop-top'),
+    sizeTier: 'half',
   },
   {
     id: 'shop-slow',
@@ -452,7 +441,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'pro-shop',
     tier: 'det',
     render: { kind: 'ranking', field: 'slowShopItems' },
-    default: chart('shop-slow'),
+    sizeTier: 'half',
   },
   {
     id: 'shop-margin',
@@ -461,7 +450,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'pro-shop',
     tier: 'det',
     render: { kind: 'breakdown', field: 'shopMargins', format: 'percent' },
-    default: chart('shop-margin'),
+    sizeTier: 'half',
   },
   {
     id: 'shop-turnover',
@@ -470,7 +459,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'pro-shop',
     tier: 'det',
     render: { kind: 'kpi', metric: 'inventoryTurnover', format: 'number' },
-    default: kpi('shop-turnover'),
+    sizeTier: 'md',
   },
   {
     id: 'shrinkage',
@@ -479,7 +468,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'pro-shop',
     tier: 'det',
     render: { kind: 'kpi', metric: 'shrinkagePct', format: 'percent', invert: true },
-    default: kpi('shrinkage'),
+    sizeTier: 'md',
   },
   {
     id: 'opex',
@@ -488,7 +477,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'expenses',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'opex', format: 'money', invert: true },
-    default: kpi('opex'),
+    sizeTier: 'md',
   },
   {
     id: 'labor-pct',
@@ -497,7 +486,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'expenses',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'laborPct', format: 'percent', invert: true },
-    default: { i: 'labor-pct', x: 0, y: 5, w: 4, h: 5, minW: 2, minH: 4 },
+    sizeTier: 'md',
   },
   {
     id: 'payroll-dept',
@@ -506,7 +495,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'expenses',
     tier: 'det',
     render: { kind: 'breakdown', field: 'payrollDepts' },
-    default: chart('payroll-dept'),
+    sizeTier: 'half',
   },
   {
     id: 'overtime',
@@ -515,7 +504,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'expenses',
     tier: 'det',
     render: { kind: 'kpi', metric: 'overtimeCost', format: 'money', invert: true },
-    default: kpi('overtime'),
+    sizeTier: 'md',
   },
   {
     id: 'labor-per-round',
@@ -524,7 +513,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'expenses',
     tier: 'det',
     render: { kind: 'kpi', metric: 'laborPerRound', format: 'money', invert: true },
-    default: kpi('labor-per-round'),
+    sizeTier: 'md',
   },
   {
     id: 'staffing',
@@ -533,7 +522,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'expenses',
     tier: 'det',
     render: { kind: 'staffing' },
-    default: wide('staffing'),
+    sizeTier: 'full',
   },
   {
     id: 'dept-budget',
@@ -542,7 +531,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'expenses',
     tier: 'det',
     render: { kind: 'staffing' },
-    default: wide('dept-budget'),
+    sizeTier: 'full',
   },
   {
     id: 'utilities',
@@ -551,7 +540,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'utilities',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'utilitySpend', format: 'money', invert: true },
-    default: kpi('utilities'),
+    sizeTier: 'md',
   },
   {
     id: 'water',
@@ -560,7 +549,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'utilities',
     tier: 'det',
     render: { kind: 'kpi', metric: 'waterCost', format: 'money', invert: true },
-    default: kpi('water'),
+    sizeTier: 'md',
   },
   {
     id: 'electric',
@@ -569,7 +558,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'utilities',
     tier: 'det',
     render: { kind: 'kpi', metric: 'electricCost', format: 'money', invert: true },
-    default: kpi('electric'),
+    sizeTier: 'md',
   },
   {
     id: 'fuel',
@@ -578,7 +567,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'utilities',
     tier: 'det',
     render: { kind: 'kpi', metric: 'fuelCost', format: 'money', invert: true },
-    default: kpi('fuel'),
+    sizeTier: 'md',
   },
   {
     id: 'utility-per-round',
@@ -587,7 +576,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'utilities',
     tier: 'det',
     render: { kind: 'kpi', metric: 'utilityPerRound', format: 'money', invert: true },
-    default: kpi('utility-per-round'),
+    sizeTier: 'md',
   },
   {
     id: 'seasonal-util',
@@ -596,7 +585,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'utilities',
     tier: 'det',
     render: { kind: 'seasonal-utilities' },
-    default: wide('seasonal-util'),
+    sizeTier: 'full',
   },
   {
     id: 'maintenance',
@@ -605,7 +594,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'maintenance',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'maintenanceSpend', format: 'money', invert: true },
-    default: kpi('maintenance'),
+    sizeTier: 'md',
   },
   {
     id: 'equipment-maint',
@@ -614,7 +603,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'maintenance',
     tier: 'det',
     render: { kind: 'breakdown', field: 'equipmentMaint' },
-    default: chart('equipment-maint'),
+    sizeTier: 'half',
   },
   {
     id: 'downtime',
@@ -623,7 +612,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'maintenance',
     tier: 'det',
     render: { kind: 'fleet' },
-    default: chart('downtime'),
+    sizeTier: 'half',
   },
   {
     id: 'fleet',
@@ -632,7 +621,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'maintenance',
     tier: 'det',
     render: { kind: 'fleet' },
-    default: chart('fleet'),
+    sizeTier: 'half',
   },
   {
     id: 'maint-area',
@@ -641,7 +630,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'maintenance',
     tier: 'det',
     render: { kind: 'breakdown', field: 'maintenanceAreas' },
-    default: chart('maint-area'),
+    sizeTier: 'half',
   },
   {
     id: 'chemicals',
@@ -650,7 +639,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'maintenance',
     tier: 'det',
     render: { kind: 'breakdown', field: 'chemicals' },
-    default: chart('chemicals'),
+    sizeTier: 'half',
   },
   {
     id: 'maint-labor',
@@ -659,7 +648,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'maintenance',
     tier: 'det',
     render: { kind: 'maint-labor' },
-    default: kpi('maint-labor'),
+    sizeTier: 'md',
   },
   {
     id: 'weather-events',
@@ -668,7 +657,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'maintenance',
     tier: 'det',
     render: { kind: 'weather-events' },
-    default: chart('weather-events'),
+    sizeTier: 'half',
   },
   {
     id: 'yoy-trend',
@@ -677,7 +666,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'trends',
     tier: 'hl',
     render: { kind: 'yoy' },
-    default: wide('yoy-trend'),
+    sizeTier: 'full',
   },
   {
     id: 'budget',
@@ -686,7 +675,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'trends',
     tier: 'hl',
     render: { kind: 'budget' },
-    default: { i: 'budget', x: 0, y: 10, w: 6, h: 8, minW: 3, minH: 6 },
+    sizeTier: 'half',
   },
   {
     id: 'ebitda',
@@ -695,7 +684,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'trends',
     tier: 'hl',
     render: { kind: 'kpi', metric: 'ebitda', format: 'money' },
-    default: { i: 'ebitda', x: 8, y: 5, w: 4, h: 5, minW: 2, minH: 4 },
+    sizeTier: 'md',
   },
   {
     id: 'gop',
@@ -704,7 +693,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'trends',
     tier: 'det',
     render: { kind: 'kpi', metric: 'gop', format: 'money' },
-    default: kpi('gop'),
+    sizeTier: 'md',
   },
   {
     id: 'weather',
@@ -713,7 +702,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'trends',
     tier: 'det',
     render: { kind: 'weather' },
-    default: wide('weather'),
+    sizeTier: 'full',
   },
   {
     id: 'opportunities',
@@ -722,7 +711,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'trends',
     tier: 'det',
     render: { kind: 'opportunities' },
-    default: wide('opportunities'),
+    sizeTier: 'full',
   },
   {
     id: 'new-repeat',
@@ -731,7 +720,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'customers',
     tier: 'hl',
     render: { kind: 'new-repeat' },
-    default: kpi('new-repeat'),
+    sizeTier: 'md',
   },
   {
     id: 'loyalty',
@@ -740,7 +729,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'customers',
     tier: 'det',
     render: { kind: 'loyalty' },
-    default: kpi('loyalty'),
+    sizeTier: 'md',
   },
   {
     id: 'league',
@@ -749,7 +738,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'customers',
     tier: 'det',
     render: { kind: 'league' },
-    default: kpi('league'),
+    sizeTier: 'md',
   },
   {
     id: 'membership',
@@ -758,7 +747,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'customers',
     tier: 'det',
     render: { kind: 'membership' },
-    default: kpi('membership'),
+    sizeTier: 'md',
   },
   {
     id: 'clv',
@@ -767,7 +756,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'customers',
     tier: 'det',
     render: { kind: 'kpi', metric: 'clv', format: 'money' },
-    default: kpi('clv'),
+    sizeTier: 'md',
   },
   {
     id: 'comparison',
@@ -776,7 +765,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'properties',
     tier: 'hl',
     render: { kind: 'comparison' },
-    default: wide('comparison'),
+    sizeTier: 'full',
   },
   {
     id: 'course-category',
@@ -785,7 +774,7 @@ export const WIDGET_CATALOG: WidgetDefinition[] = [
     category: 'properties',
     tier: 'det',
     render: { kind: 'course-category' },
-    default: wide('course-category'),
+    sizeTier: 'full',
   },
 ]
 
@@ -802,10 +791,24 @@ export const DEFAULT_WIDGETS: WidgetId[] = [
 
 export function defaultLayouts(widgetIds?: WidgetId[]) {
   const ids = widgetIds ?? DEFAULT_WIDGETS
-  const lg = WIDGET_CATALOG.filter((widget) => ids.includes(widget.id)).map(
-    (widget) => widget.default,
-  )
+  return packDetailLayouts(ids.filter((id) => widgetById(id)?.tier === 'det'))
+}
+
+export function packDetailLayouts(detailIds: WidgetId[]) {
+  const lg = packWidgets(detailIds, (id) => widgetById(id)?.sizeTier ?? 'md')
   return { lg, md: lg, sm: lg }
+}
+
+export function splitWidgetIds(ids: WidgetId[]) {
+  const hl: WidgetId[] = []
+  const det: WidgetId[] = []
+  for (const id of ids) {
+    const widget = widgetById(id)
+    if (!widget) continue
+    if (widget.tier === 'hl') hl.push(id)
+    else det.push(id)
+  }
+  return { hl, det }
 }
 
 export function widgetById(id: string) {
