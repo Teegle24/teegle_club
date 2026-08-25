@@ -522,27 +522,73 @@ function scalePct(_value: number) {
   return _value
 }
 
-function sparklineFrom(current: number, priorRatio: number) {
-  const start = current * priorRatio
-  return Array.from({ length: 12 }, (_, index) => {
-    const t = index / 11
-    const wave = Math.sin(index * 0.65) * current * 0.045
-    const value = start + (current - start) * t + wave
-    return index === 11 ? current : Math.max(0, value)
-  })
+function hashSeed(seed: string) {
+  let hash = 2166136261
+  for (let index = 0; index < seed.length; index += 1) {
+    hash ^= seed.charCodeAt(index)
+    hash = Math.imul(hash, 16777619)
+  }
+  return hash >>> 0
+}
+
+type SparkKind = 'volume' | 'bookings' | 'rate' | 'cost' | 'idle' | 'margin'
+
+const SPARK_SHAPE: Record<SparkKind, number[]> = {
+  volume: [0, 0.2, 0.95, 0.35, -0.9, 0.15, 1, 0],
+  bookings: [0, -0.45, 0.25, 1, 0.2, -0.7, 0.55, 0],
+  rate: [0, 0.4, -0.35, 0.5, 0, -0.4, 0.25, 0],
+  cost: [0, 0.05, 0.08, 0.1, 0.12, 0.55, 0.6, 0],
+  idle: [0, 0.7, -0.15, 1, 0.05, -0.55, 0.35, 0],
+  margin: [0, 0.08, 0.12, 0.28, 0.22, 0.45, 0.72, 0],
+}
+
+function sparklineSeries(
+  current: number,
+  prior: number,
+  seed: string,
+  kind: SparkKind = 'volume',
+) {
+  const shape = SPARK_SHAPE[kind]
+  const points = shape.length
+  const hash = hashSeed(seed)
+  const drift = current - prior
+  const noise = Math.max(Math.abs(drift) * 0.22, Math.abs(current) * 0.02)
+  const series: number[] = []
+
+  for (let index = 0; index < points; index += 1) {
+    const t = index / (points - 1)
+    const eased = t * t * (3 - 2 * t)
+    const along = prior + drift * eased
+    const mix = ((hash >> ((index * 5) % 24)) & 7) / 7 - 0.5
+    series.push(Math.max(0, along + shape[index] * noise * 1.7 + mix * noise * 0.2))
+  }
+
+  series[points - 1] = current
+  return series
 }
 
 function compared(
   current: number,
   priorPeriodRatio: number,
   priorYearRatio: number,
-  extra?: Pick<ComparedValue, 'sparkline' | 'target'>,
+  extra?: Pick<ComparedValue, 'sparkline' | 'target'> & {
+    seed?: string
+    kind?: SparkKind
+  },
 ): ComparedValue {
+  const priorPeriod = Math.round(current * priorPeriodRatio * 100) / 100
   return {
     current,
-    priorPeriod: Math.round(current * priorPeriodRatio * 100) / 100,
+    priorPeriod,
     priorYear: Math.round(current * priorYearRatio * 100) / 100,
-    sparkline: extra?.sparkline ?? sparklineFrom(current, priorPeriodRatio),
+    sparkline:
+      extra?.sparkline ??
+      sparklineSeries(
+        current,
+        priorPeriod,
+        extra?.seed ?? `${current}:${priorPeriod}:${priorYearRatio}:${extra?.kind ?? 'volume'}`,
+        extra?.kind,
+      ),
     target: extra?.target,
   }
 }
@@ -713,48 +759,73 @@ export function summaryFor(
   const utility = scale(row.waterCost + row.electricCost + row.fuelCost, period)
   const comps = scale(row.comps, period)
   const noShows = scale(row.noShowCount, period)
-  const trend = trendFor(scope)
   const revenueBudget = Math.round(revenue / row.budgetRatio)
   const roundsBudget = Math.round(rounds / (row.budgetRatio - 0.02))
+  const seed = `${row.propertyId}-${period}`
+  const revenueSpark = sparklineSeries(
+    revenue,
+    revenue * row.priorPeriodRatio,
+    `${seed}-revenue`,
+    'volume',
+  )
+  const roundsSpark = sparklineSeries(
+    rounds,
+    rounds * (row.priorPeriodRatio + 0.01),
+    `${seed}-rounds`,
+    'bookings',
+  )
+  const rprCurrent = rounds ? Math.round(revenue / rounds) : 0
+  const rprSpark = revenueSpark.map((value, index) => {
+    const played = roundsSpark[index]
+    return played ? value / played : rprCurrent
+  })
 
   return {
     propertyId: scope?.type === 'property' ? scope.propertyId : null,
     period: windowFor(period),
     currency: 'USD',
     revenue: compared(revenue, row.priorPeriodRatio, row.priorYearRatio, {
-      sparkline: trend.map((point) => point.revenue),
+      sparkline: revenueSpark,
       target: revenueBudget,
     }),
     rounds: compared(rounds, row.priorPeriodRatio + 0.01, row.priorYearRatio, {
-      sparkline: trend.map((point) => point.rounds),
+      sparkline: roundsSpark,
       target: roundsBudget,
     }),
-    revenuePerRound: compared(
-      rounds ? Math.round(revenue / rounds) : 0,
-      row.priorPeriodRatio,
-      row.priorYearRatio + 0.02,
-    ),
+    revenuePerRound: compared(rprCurrent, row.priorPeriodRatio, row.priorYearRatio + 0.02, {
+      sparkline: rprSpark,
+    }),
     utilizationPct: compared(
       utilization,
       row.priorPeriodRatio + 0.02,
       row.priorYearRatio,
-      {
-        sparkline: trend.map((point) => point.utilizationPct),
-        target: 80,
-      },
+      { seed: `${seed}-util`, kind: 'rate', target: 80 },
     ),
-    ebitda: compared(scale(row.ebitda, period), row.priorPeriodRatio, row.priorYearRatio),
-    gop: compared(scale(row.gop, period), row.priorPeriodRatio, row.priorYearRatio),
+    ebitda: compared(scale(row.ebitda, period), row.priorPeriodRatio, row.priorYearRatio, {
+      seed: `${seed}-ebitda`,
+      kind: 'volume',
+    }),
+    gop: compared(scale(row.gop, period), row.priorPeriodRatio, row.priorYearRatio, {
+      seed: `${seed}-gop`,
+      kind: 'volume',
+    }),
     laborCost: compared(labor, row.priorPeriodRatio - 0.01, row.priorYearRatio, {
+      seed: `${seed}-labor`,
+      kind: 'cost',
       target: Math.round(labor / 1.06),
     }),
     laborPct: compared(revenue ? (labor / revenue) * 100 : 0, 1.03, 1.05, {
+      seed: `${seed}-labor-pct`,
+      kind: 'cost',
       target: 28,
     }),
     laborPerRound: compared(rounds ? labor / rounds : 0, 1.02, 1.04),
     compsPct: compared((row.comps / row.revenue) * 100, 0.92, 0.88),
     compsDollars: compared(comps, 0.92, 0.88),
-    leftoverTeeTimeDollars: compared(leftover, 1.08, 1.12),
+    leftoverTeeTimeDollars: compared(leftover, 1.08, 1.12, {
+      seed: `${seed}-leftover`,
+      kind: 'idle',
+    }),
     fbRevenue: compared(fbRevenue, row.priorPeriodRatio, row.priorYearRatio + 0.03),
     fbCapturePct: compared(scalePct(row.fbCapturePct), 0.97, 0.94),
     avgCheckFb: compared(row.avgCheckFb, 0.98, 0.95),

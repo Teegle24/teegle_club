@@ -71,8 +71,8 @@ export function ComparedBlock({
         : current >= target * 0.98
 
   return (
-    <div className="flex h-full min-h-0 flex-col justify-between gap-2">
-      <div>
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="shrink-0">
         <div className="flex items-start justify-between gap-2">
           <p
             className={cn(
@@ -103,58 +103,62 @@ export function ComparedBlock({
         </p>
       </div>
 
-      {spark.length > 1 ? (
-        <Sparkline
-          values={spark}
-          tone={improved === false ? 'warn' : 'brand'}
-          className={cn(dark && 'opacity-90')}
-        />
-      ) : null}
+      <div className="flex min-h-0 flex-1 items-center py-1">
+        {spark.length > 1 ? (
+          <Sparkline
+            values={spark}
+            tone={improved === false ? 'warn' : 'brand'}
+            className={cn(dark && 'opacity-90')}
+          />
+        ) : null}
+      </div>
 
-      {target != null ? (
-        <div className="mt-auto">
-          <div
-            className={cn(
-              'mb-1 flex items-baseline justify-between gap-2 text-[11px]',
-              dark ? 'text-white/60' : 'text-ink-soft',
-            )}
-          >
-            <span>
-              {format === 'percent' ? 'Target' : 'Budget'} {formatCompared(target, format)}
-            </span>
-            <span className="tabular-nums">{pace}</span>
-          </div>
-          <div
-            className={cn(
-              'relative h-1.5 overflow-hidden rounded-full',
-              dark ? 'bg-white/10' : 'bg-canvas-2',
-            )}
-          >
+      <div className="h-[2.35rem] shrink-0">
+        {target != null ? (
+          <>
             <div
               className={cn(
-                'h-full rounded-full',
-                onPace ? (dark ? 'bg-brand-2' : 'bg-brand') : 'bg-destructive/80',
+                'mb-1 flex items-baseline justify-between gap-2 text-[11px]',
+                dark ? 'text-white/60' : 'text-ink-soft',
               )}
-              style={{ width: `${Math.max(4, barPct)}%` }}
-            />
-            {markerPct != null ? (
-              <span
+            >
+              <span>
+                {format === 'percent' ? 'Target' : 'Budget'} {formatCompared(target, format)}
+              </span>
+              <span className="tabular-nums">{pace}</span>
+            </div>
+            <div
+              className={cn(
+                'relative h-1.5 overflow-hidden rounded-full',
+                dark ? 'bg-white/10' : 'bg-canvas-2',
+              )}
+            >
+              <div
                 className={cn(
-                  'absolute top-0 h-full w-px',
-                  dark ? 'bg-white/70' : 'bg-ink/50',
+                  'h-full rounded-full',
+                  onPace ? (dark ? 'bg-brand-2' : 'bg-brand') : 'bg-destructive/80',
                 )}
-                style={{ left: `${markerPct}%` }}
+                style={{ width: `${Math.max(4, barPct)}%` }}
               />
-            ) : null}
-          </div>
-        </div>
-      ) : compact ? null : (
-        <p className={cn('mt-auto text-[11px] tabular-nums', dark ? 'text-white/55' : 'text-ink-soft')}>
-          Prior {formatCompared(value.priorPeriod, format)}
-          {' · '}
-          LY {formatCompared(value.priorYear, format)}
-        </p>
-      )}
+              {markerPct != null ? (
+                <span
+                  className={cn(
+                    'absolute top-0 h-full w-px',
+                    dark ? 'bg-white/70' : 'bg-ink/50',
+                  )}
+                  style={{ left: `${markerPct}%` }}
+                />
+              ) : null}
+            </div>
+          </>
+        ) : compact ? null : (
+          <p className={cn('pt-1 text-[11px] tabular-nums', dark ? 'text-white/55' : 'text-ink-soft')}>
+            Prior {formatCompared(value.priorPeriod, format)}
+            {' · '}
+            LY {formatCompared(value.priorYear, format)}
+          </p>
+        )}
+      </div>
     </div>
   )
 }
