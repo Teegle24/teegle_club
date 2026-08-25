@@ -1,3 +1,16 @@
+import type { LucideIcon } from 'lucide-react'
+import {
+  CalendarDays,
+  DollarSign,
+  Landmark,
+  LineChart,
+  ShoppingBag,
+  Sprout,
+  Users,
+  UtensilsCrossed,
+  Wrench,
+  Zap,
+} from 'lucide-react'
 import type {
   ComparedMetricKey,
   GridWidgetLayout,
@@ -133,17 +146,17 @@ export interface WidgetDefinition {
   sizeTier: SizeTier
 }
 
-export const CATEGORIES: { id: MetricCategory; label: string }[] = [
-  { id: 'revenue', label: 'Revenue' },
-  { id: 'tee-sheet', label: 'Tee sheet' },
-  { id: 'fb', label: 'F&B' },
-  { id: 'pro-shop', label: 'Pro shop' },
-  { id: 'expenses', label: 'Expenses' },
-  { id: 'utilities', label: 'Utilities' },
-  { id: 'maintenance', label: 'Maintenance' },
-  { id: 'trends', label: 'Trends' },
-  { id: 'customers', label: 'Customers' },
-  { id: 'properties', label: 'Properties' },
+export const CATEGORIES: { id: MetricCategory; label: string; icon: LucideIcon }[] = [
+  { id: 'revenue', label: 'Revenue', icon: DollarSign },
+  { id: 'tee-sheet', label: 'Tee sheet', icon: CalendarDays },
+  { id: 'fb', label: 'F&B', icon: UtensilsCrossed },
+  { id: 'pro-shop', label: 'Pro shop', icon: ShoppingBag },
+  { id: 'expenses', label: 'Expenses', icon: Landmark },
+  { id: 'utilities', label: 'Utilities', icon: Zap },
+  { id: 'maintenance', label: 'Maintenance', icon: Wrench },
+  { id: 'trends', label: 'Trends', icon: LineChart },
+  { id: 'customers', label: 'Customers', icon: Users },
+  { id: 'properties', label: 'Properties', icon: Sprout },
 ]
 
 export const WIDGET_CATALOG: WidgetDefinition[] = [
@@ -841,6 +854,10 @@ export function groupDetailByCategory(detailIds: WidgetId[]) {
 
 export function categoryLabel(category: MetricCategory) {
   return CATEGORIES.find((item) => item.id === category)?.label ?? category
+}
+
+export function categoryIcon(category: MetricCategory) {
+  return CATEGORIES.find((item) => item.id === category)?.icon
 }
 
 export function splitWidgetIds(ids: WidgetId[]) {

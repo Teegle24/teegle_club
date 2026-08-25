@@ -1,12 +1,3 @@
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
 import { useBreakdown } from '@/api/hooks'
 import {
   WidgetEmpty,
@@ -15,6 +6,12 @@ import {
 } from '@/components/widget-states'
 import { formatMoney, formatNumber, formatPercent } from '@/lib/format'
 import type { MetricsBreakdown } from '@/types'
+
+function formatAmount(value: number, format: 'money' | 'number' | 'percent') {
+  if (format === 'money') return formatMoney(value)
+  if (format === 'percent') return formatPercent(value, 0)
+  return formatNumber(value)
+}
 
 export function BreakdownWidget({
   field,
@@ -41,60 +38,37 @@ export function BreakdownWidget({
     return <WidgetEmpty message="No mix data for this scope yet." />
   }
 
+  const ranked = [...rows].sort((a, b) => b.amount - a.amount)
+  const max = Math.max(...ranked.map((row) => row.amount), 1)
+
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart
-        data={rows}
-        layout="vertical"
-        margin={{ top: 4, right: 12, left: 8, bottom: 4 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
-        <XAxis
-          type="number"
-          tickFormatter={(value: number) =>
-            format === 'money'
-              ? formatMoney(value)
-              : format === 'percent'
-                ? formatPercent(value, 0)
-                : formatNumber(value)
-          }
-          tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <YAxis
-          type="category"
-          dataKey="name"
-          width={118}
-          tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <Tooltip
-          formatter={(value, _name, item) => {
-            const payload = item?.payload as { marginPct?: number; sharePct?: number }
-            const main =
-              format === 'money'
-                ? formatMoney(Number(value))
-                : format === 'percent'
-                  ? formatPercent(Number(value))
-                  : formatNumber(Number(value))
-            const extra = showMargin && payload.marginPct != null
-              ? ` · ${formatPercent(payload.marginPct)} margin`
-              : payload.sharePct != null
-                ? ` · ${formatPercent(payload.sharePct)}`
-                : ''
-            return [`${main}${extra}`, '']
-          }}
-          contentStyle={{
-            background: 'var(--card)',
-            border: '1px solid var(--border)',
-            borderRadius: 8,
-            fontSize: 12,
-          }}
-        />
-        <Bar dataKey="amount" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
-      </BarChart>
-    </ResponsiveContainer>
+    <ul className="flex h-full flex-col justify-center gap-2.5">
+      {ranked.map((row) => {
+        const width = Math.max(4, (row.amount / max) * 100)
+        const extra =
+          showMargin && row.marginPct != null
+            ? ` · ${formatPercent(row.marginPct)} margin`
+            : row.sharePct != null
+              ? ` · ${formatPercent(row.sharePct, 0)}`
+              : ''
+        return (
+          <li key={row.id} className="min-w-0">
+            <div className="mb-1 flex items-baseline justify-between gap-3 text-[12px]">
+              <span className="truncate text-ink">{row.name}</span>
+              <span className="shrink-0 tabular-nums text-ink-soft">
+                {formatAmount(row.amount, format)}
+                {extra}
+              </span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-sm bg-canvas-2">
+              <div
+                className="h-full rounded-sm bg-brand"
+                style={{ width: `${width}%` }}
+              />
+            </div>
+          </li>
+        )
+      })}
+    </ul>
   )
 }

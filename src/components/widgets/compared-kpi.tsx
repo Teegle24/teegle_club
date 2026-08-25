@@ -12,11 +12,13 @@ export function ComparedKpiWidget({
   format,
   invert = false,
   dark = false,
+  compact = false,
 }: {
   metric: ComparedMetricKey
   format: 'money' | 'number' | 'percent'
   invert?: boolean
   dark?: boolean
+  compact?: boolean
 }) {
   const query = useMetrics()
   const value = query.data?.[metric]
@@ -41,6 +43,7 @@ export function ComparedKpiWidget({
       invert={invert}
       size="md"
       dark={dark}
+      compact={compact}
     />
   )
 }

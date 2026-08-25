@@ -1,5 +1,8 @@
-import type { ComparedValue } from '@/types'
+import type { ComparedValue, PeriodKey } from '@/types'
+import { Sparkline } from '@/components/dashboard/sparkline'
+import { PRIOR_PERIOD_LABEL } from '@/lib/period-copy'
 import { formatMoney, formatNumber, formatPercent } from '@/lib/format'
+import { usePeriod } from '@/context/period'
 import { cn } from '@/lib/utils'
 
 export function formatCompared(
@@ -11,11 +14,22 @@ export function formatCompared(
   return formatNumber(value)
 }
 
-const SERIES = [
-  { key: 'current', label: 'Now', field: 'current' as const, tone: 'brand' as const },
-  { key: 'priorPeriod', label: 'Prior', field: 'priorPeriod' as const, tone: 'steel' as const },
-  { key: 'priorYear', label: 'LY', field: 'priorYear' as const, tone: 'mist' as const },
-]
+function paceCopy(
+  current: number,
+  target: number,
+  format: 'money' | 'number' | 'percent',
+  invert: boolean,
+) {
+  if (format === 'percent') {
+    const pts = current - target
+    const abs = Math.abs(pts).toFixed(1)
+    if (Math.abs(pts) < 0.05) return 'On target'
+    if (invert) return pts < 0 ? `${abs} pts under` : `${abs} pts over`
+    return pts < 0 ? `${abs} pts short` : `${abs} pts over`
+  }
+  const pct = target === 0 ? 0 : (current / target) * 100
+  return `${pct.toFixed(0)}% to plan`
+}
 
 export function ComparedBlock({
   value,
@@ -23,92 +37,124 @@ export function ComparedBlock({
   invert = false,
   size = 'lg',
   dark = false,
+  compact = false,
 }: {
   value: ComparedValue
   format: 'money' | 'number' | 'percent'
   invert?: boolean
   size?: 'lg' | 'md'
   dark?: boolean
+  compact?: boolean
 }) {
+  const { period } = usePeriod()
   const current = value.current ?? 0
   const prior = value.priorPeriod ?? 0
   const delta = prior === 0 ? null : ((current - prior) / Math.abs(prior)) * 100
   const improved = delta == null ? null : invert ? delta < 0 : delta > 0
-  const amounts = SERIES.map((row) => value[row.field] ?? 0)
-  const max = Math.max(...amounts, 1)
-  const summary = SERIES.map((row, index) => {
-    return `${row.label} ${formatCompared(amounts[index], format)}`
-  }).join(', ')
-
-  const barTone = {
-    brand: dark ? 'bg-brand-2' : 'bg-brand',
-    steel: dark ? 'bg-white/35' : 'bg-steel/70',
-    mist: dark ? 'bg-white/20' : 'bg-canvas-3',
-  }
+  const target = value.target ?? null
+  const spark = value.sparkline ?? []
+  const vsLabel = PRIOR_PERIOD_LABEL[period as PeriodKey] ?? 'vs prior'
+  const pace = target != null ? paceCopy(current, target, format, invert) : null
+  const barPct =
+    target == null
+      ? 0
+      : format === 'percent'
+        ? Math.min(100, current)
+        : Math.min(100, (current / Math.max(target, 1)) * 100)
+  const markerPct =
+    target != null && format === 'percent' ? Math.min(100, target) : null
+  const onPace =
+    target == null
+      ? improved !== false
+      : invert
+        ? current <= target
+        : current >= target * 0.98
 
   return (
-    <div className="flex h-full flex-col justify-between gap-4">
-      <div className="flex items-start justify-between gap-2">
-        <p
-          className={cn(
-            'font-display font-semibold tabular-nums tracking-tight',
-            size === 'lg' ? 'text-[1.7rem] leading-none' : 'text-[1.55rem] leading-none',
-            dark ? 'text-white' : 'text-ink',
-          )}
-        >
-          {formatCompared(value.current, format)}
-        </p>
-        {delta != null ? (
-          <span
+    <div className="flex h-full min-h-0 flex-col justify-between gap-2">
+      <div>
+        <div className="flex items-start justify-between gap-2">
+          <p
             className={cn(
-              'mt-1 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold tabular-nums',
-              improved === false &&
-                (dark ? 'bg-red-400/20 text-red-100' : 'bg-destructive/10 text-destructive'),
-              improved !== false &&
-                (dark ? 'bg-emerald-400/20 text-emerald-100' : 'bg-brand/10 text-brand'),
+              'font-display font-semibold tabular-nums tracking-tight',
+              size === 'lg' ? 'text-[1.7rem] leading-none' : 'text-[1.45rem] leading-none',
+              dark ? 'text-white' : 'text-ink',
             )}
           >
-            {delta > 0 ? '+' : ''}
-            {delta.toFixed(1)}%
-          </span>
-        ) : null}
+            {formatCompared(value.current, format)}
+          </p>
+          {delta != null ? (
+            <span
+              className={cn(
+                'mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold tabular-nums',
+                improved === false &&
+                  (dark ? 'bg-red-400/20 text-red-100' : 'bg-destructive/10 text-destructive'),
+                improved !== false &&
+                  (dark ? 'bg-emerald-400/20 text-emerald-100' : 'bg-brand/10 text-brand'),
+              )}
+            >
+              {delta > 0 ? '+' : ''}
+              {delta.toFixed(1)}%
+            </span>
+          ) : null}
+        </div>
+        <p className={cn('mt-1 text-[11px]', dark ? 'text-white/55' : 'text-ink-soft')}>
+          {vsLabel}
+        </p>
       </div>
-      <div className="space-y-2" role="img" aria-label={summary}>
-        {SERIES.map((row, index) => {
-          const amount = amounts[index]
-          const width = Math.max(4, (amount / max) * 100)
-          const isNow = index === 0
-          return (
-            <div key={row.key} className="grid grid-cols-[2.4rem_1fr] items-center gap-2">
+
+      {spark.length > 1 ? (
+        <Sparkline
+          values={spark}
+          tone={improved === false ? 'warn' : 'brand'}
+          className={cn(dark && 'opacity-90')}
+        />
+      ) : null}
+
+      {target != null ? (
+        <div className="mt-auto">
+          <div
+            className={cn(
+              'mb-1 flex items-baseline justify-between gap-2 text-[11px]',
+              dark ? 'text-white/60' : 'text-ink-soft',
+            )}
+          >
+            <span>
+              {format === 'percent' ? 'Target' : 'Budget'} {formatCompared(target, format)}
+            </span>
+            <span className="tabular-nums">{pace}</span>
+          </div>
+          <div
+            className={cn(
+              'relative h-1.5 overflow-hidden rounded-full',
+              dark ? 'bg-white/10' : 'bg-canvas-2',
+            )}
+          >
+            <div
+              className={cn(
+                'h-full rounded-full',
+                onPace ? (dark ? 'bg-brand-2' : 'bg-brand') : 'bg-destructive/80',
+              )}
+              style={{ width: `${Math.max(4, barPct)}%` }}
+            />
+            {markerPct != null ? (
               <span
                 className={cn(
-                  'text-[10px] leading-none',
-                  dark ? 'text-white/55' : 'text-ink-soft',
+                  'absolute top-0 h-full w-px',
+                  dark ? 'bg-white/70' : 'bg-ink/50',
                 )}
-              >
-                {row.label}
-              </span>
-              <div
-                className={cn(
-                  'h-2 overflow-hidden rounded-sm',
-                  dark ? 'bg-white/10' : 'bg-canvas-2',
-                )}
-                title={`${row.label}: ${formatCompared(amount, format)}`}
-              >
-                <div
-                  className={cn(
-                    'h-full rounded-sm transition-[width]',
-                    isNow && improved === false && (dark ? 'bg-red-300' : 'bg-destructive/80'),
-                    isNow && improved !== false && barTone.brand,
-                    !isNow && barTone[row.tone],
-                  )}
-                  style={{ width: `${width}%` }}
-                />
-              </div>
-            </div>
-          )
-        })}
-      </div>
+                style={{ left: `${markerPct}%` }}
+              />
+            ) : null}
+          </div>
+        </div>
+      ) : compact ? null : (
+        <p className={cn('mt-auto text-[11px] tabular-nums', dark ? 'text-white/55' : 'text-ink-soft')}>
+          Prior {formatCompared(value.priorPeriod, format)}
+          {' · '}
+          LY {formatCompared(value.priorYear, format)}
+        </p>
+      )}
     </div>
   )
 }

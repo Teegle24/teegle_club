@@ -53,6 +53,8 @@ export interface ComparedValue {
   current: number | null
   priorPeriod: number | null
   priorYear: number | null
+  sparkline?: number[]
+  target?: number | null
 }
 
 export type ComparedMetricKey =

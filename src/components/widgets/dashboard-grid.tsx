@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { RotateCcw } from 'lucide-react'
 import { SectionHeading } from '@/components/dashboard/section-heading'
 import {
-  categoryLabel,
+  categoryIcon,
   groupDetailByCategory,
   splitWidgetIds,
   widgetById,
@@ -36,7 +36,7 @@ function WidgetTile({
       <WidgetFrame
         widgetId={id}
         title={widget.title}
-        eyebrow={categoryLabel(widget.category)}
+        icon={categoryIcon(widget.category)}
         onRemove={onRemove}
         featured={featured}
         className={cn(
@@ -87,7 +87,7 @@ export function DashboardGrid({
           <SectionHeading
             eyebrow="High level"
             title="At a glance"
-            description="Eight KPIs — uniform tiles, fixed grid."
+            description="Sparkline, pace to plan, and change vs the selected period."
           />
           <Button type="button" variant="outline" size="sm" onClick={resetLayout}>
             <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
@@ -100,7 +100,7 @@ export function DashboardGrid({
             No high-level metrics selected. Add them from the sidebar metric list.
           </div>
         ) : (
-          <div className="grid auto-rows-[12.5rem] grid-cols-12 gap-3">
+          <div className="grid auto-rows-[15rem] grid-cols-12 gap-3">
             {hlIds.map((id) => (
               <div key={id} className="col-span-12 h-full min-h-0 sm:col-span-6 xl:col-span-3">
                 <WidgetTile

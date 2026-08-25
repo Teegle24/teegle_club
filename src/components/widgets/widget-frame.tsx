@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronRight, X } from 'lucide-react'
+import { ChevronRight, X, type LucideIcon } from 'lucide-react'
 import type { WidgetId } from '@/components/widgets/catalog'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -9,6 +9,7 @@ export function WidgetFrame({
   widgetId,
   title,
   eyebrow,
+  icon: Icon,
   onRemove,
   children,
   className,
@@ -19,6 +20,7 @@ export function WidgetFrame({
   widgetId: WidgetId
   title: string
   eyebrow?: string
+  icon?: LucideIcon
   onRemove?: () => void
   children: ReactNode
   className?: string
@@ -57,20 +59,23 @@ export function WidgetFrame({
         className,
       )}
     >
-      <div
-        className={cn(
-          'absolute inset-x-0 top-0 h-0.5',
-          featured ? 'bg-brand-2' : 'bg-brand/70',
-        )}
-      />
       <header
         className={cn(
-          'flex items-center gap-1 border-b px-2 py-1.5',
-          featured ? 'border-white/10' : 'border-border/60 bg-canvas-2/50',
+          'flex items-center gap-1.5 px-3 pt-2.5',
+          featured ? 'text-white' : 'text-ink',
         )}
       >
+        {Icon ? (
+          <Icon
+            className={cn(
+              'h-3.5 w-3.5 shrink-0',
+              featured ? 'text-ice/80' : 'text-brand',
+            )}
+            aria-hidden
+          />
+        ) : null}
         <div className="min-w-0 flex-1">
-          {eyebrow ? (
+          {eyebrow && !Icon ? (
             <p
               className={cn(
                 'label truncate leading-none',
@@ -82,7 +87,7 @@ export function WidgetFrame({
           ) : null}
           <h2
             className={cn(
-              'truncate font-display text-[13px] font-semibold tracking-tight',
+              'truncate text-[13px] font-medium tracking-tight',
               featured ? 'text-white' : 'text-ink',
             )}
           >
@@ -92,7 +97,7 @@ export function WidgetFrame({
         {interactive ? (
           <ChevronRight
             className={cn(
-              'mr-1 h-3.5 w-3.5 shrink-0 opacity-40 transition-opacity group-hover:opacity-100',
+              'h-3.5 w-3.5 shrink-0 opacity-40 transition-opacity group-hover:opacity-100',
               featured ? 'text-white/40' : 'text-ink-soft/60',
             )}
             aria-hidden
@@ -117,7 +122,7 @@ export function WidgetFrame({
           </Button>
         ) : null}
       </header>
-      <div className="min-h-0 flex-1 overflow-hidden px-4 pb-3 pt-2">{children}</div>
+      <div className="min-h-0 flex-1 overflow-hidden px-3 pb-3 pt-2">{children}</div>
     </section>
   )
 }

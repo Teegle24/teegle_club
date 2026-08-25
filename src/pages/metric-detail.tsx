@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { PeriodPicker } from '@/components/dashboard/period-picker'
 import { SectionHeading } from '@/components/dashboard/section-heading'
 import {
+  categoryIcon,
   categoryLabel,
   isWidgetId,
   widgetById,
@@ -86,7 +87,7 @@ export function MetricDetailPage() {
           <WidgetFrame
             widgetId={widgetId}
             title={widget.title}
-            eyebrow={categoryLabel(widget.category)}
+            icon={categoryIcon(widget.category)}
             interactive={false}
             showRemove={false}
             featured={widgetId === 'budget'}

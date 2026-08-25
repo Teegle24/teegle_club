@@ -113,6 +113,7 @@ export function renderWidgetContent(
         format={widget.render.format}
         invert={widget.render.invert}
         dark={dark}
+        compact={compact}
       />
     )
   }
