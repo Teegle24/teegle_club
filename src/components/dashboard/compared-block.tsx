@@ -103,12 +103,13 @@ export function ComparedBlock({
         </p>
       </div>
 
-      <div className="flex min-h-0 flex-1 items-center py-1">
+      <div className="flex min-h-0 flex-1 items-stretch py-1">
         {spark.length > 1 ? (
           <Sparkline
             values={spark}
+            format={format}
             tone={improved === false ? 'warn' : 'brand'}
-            className={cn(dark && 'opacity-90')}
+            dark={dark}
           />
         ) : null}
       </div>

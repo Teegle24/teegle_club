@@ -100,7 +100,7 @@ export function DashboardGrid({
             No high-level metrics selected. Add them from the sidebar metric list.
           </div>
         ) : (
-          <div className="grid auto-rows-[15rem] grid-cols-12 gap-3">
+          <div className="grid auto-rows-[16.5rem] grid-cols-12 gap-3">
             {hlIds.map((id) => (
               <div key={id} className="col-span-12 h-full min-h-0 sm:col-span-6 xl:col-span-3">
                 <WidgetTile
