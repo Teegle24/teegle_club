@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces", ui-serif, Georgia, serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.5rem;
+  --background: #f3efe6;
+  --foreground: #1c1917;
+  --card: #fffcf7;
+  --card-foreground: #1c1917;
+  --popover: #fffcf7;
+  --popover-foreground: #1c1917;
+  --primary: #1a3c34;
+  --primary-foreground: #f3efe6;
+  --secondary: #e7e0d2;
+  --secondary-foreground: #1a3c34;
+  --muted: #ebe4d6;
+  --muted-foreground: #6b6459;
+  --accent: #c4a35a;
+  --accent-foreground: #1c1917;
+  --destructive: #b42318;
+  --border: #ddd4c4;
+  --input: #ddd4c4;
+  --ring: #1a3c34;
+  --sidebar: #142e28;
+  --sidebar-foreground: #e8e2d6;
+  --sidebar-muted: #8fa39c;
+  --chart-1: #1a3c34;
+  --chart-2: #c4a35a;
+  --chart-3: #3d6b5e;
+  --chart-4: #8b7355;
+  --chart-5: #5c7a6e;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01" on, "tnum" on;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: color-mix(in srgb, var(--primary) 18%, transparent) !important;
+  border-radius: 0.75rem;
+  opacity: 0.5;
+}
+
+.react-resizable-handle {
+  opacity: 0.35;
+}
+
+.react-grid-item:hover .react-resizable-handle {
+  opacity: 0.85;
+}
