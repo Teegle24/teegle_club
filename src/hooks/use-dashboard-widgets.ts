@@ -4,6 +4,7 @@ import {
   DEFAULT_WIDGETS,
   isWidgetId,
   packDetailLayouts,
+  reorderHighLevelIds,
   splitWidgetIds,
   type WidgetId,
 } from '@/components/widgets/catalog'
@@ -68,11 +69,19 @@ export function useDashboardWidgets() {
     persist(DEFAULT_WIDGETS)
   }
 
+  const reorderHighLevel = (nextHl: WidgetId[]) => {
+    const nextIds = reorderHighLevelIds(widgetIds, nextHl)
+    if (nextIds.every((id, index) => id === widgetIds[index])) return
+    setWidgetIds(nextIds)
+    persist(nextIds)
+  }
+
   return {
     widgetIds,
     onToggle,
     removeWidget,
     resetLayout,
+    reorderHighLevel,
     isPending: layoutQuery.isPending,
     isError: layoutQuery.isError,
   }

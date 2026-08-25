@@ -5,7 +5,8 @@ import { usePropertyScope } from '@/context/property-scope'
 
 export function DashboardPage() {
   const { isRollup, selectedProperty } = usePropertyScope()
-  const { widgetIds, removeWidget, resetLayout, isPending } = useDashboardWidgetsContext()
+  const { widgetIds, removeWidget, resetLayout, reorderHighLevel, isPending } =
+    useDashboardWidgetsContext()
 
   return (
     <div className="grain relative">
@@ -30,6 +31,7 @@ export function DashboardPage() {
       <DashboardGrid
         widgetIds={widgetIds}
         onRemove={removeWidget}
+        onReorderHighLevel={reorderHighLevel}
         resetLayout={resetLayout}
         isPending={isPending}
       />

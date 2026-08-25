@@ -146,3 +146,15 @@ body {
 .react-resizable-handle {
   display: none;
 }
+
+.glance-grid .react-grid-item {
+  overflow: visible;
+}
+
+.glance-grid .react-grid-item > * {
+  height: 100%;
+}
+
+.widget-drag-handle {
+  touch-action: none;
+}

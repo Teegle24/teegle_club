@@ -872,6 +872,18 @@ export function splitWidgetIds(ids: WidgetId[]) {
   return { hl, det }
 }
 
+export function reorderHighLevelIds(ids: WidgetId[], nextHl: WidgetId[]): WidgetId[] {
+  const current = splitWidgetIds(ids).hl
+  const allowed = new Set(current)
+  const ordered = nextHl.filter((id) => allowed.has(id))
+  const seen = new Set(ordered)
+  for (const id of current) {
+    if (!seen.has(id)) ordered.push(id)
+  }
+  let index = 0
+  return ids.map((id) => (allowed.has(id) ? ordered[index++]! : id))
+}
+
 export function widgetById(id: string) {
   return WIDGET_CATALOG.find((widget) => widget.id === id)
 }

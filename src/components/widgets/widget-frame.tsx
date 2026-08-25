@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronRight, X, type LucideIcon } from 'lucide-react'
+import { ChevronRight, GripVertical, X, type LucideIcon } from 'lucide-react'
 import type { WidgetId } from '@/components/widgets/catalog'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -11,22 +11,26 @@ export function WidgetFrame({
   eyebrow,
   icon: Icon,
   onRemove,
+  onReorderKey,
   children,
   className,
   featured = false,
   interactive = true,
   showRemove = true,
+  reorderable = false,
 }: {
   widgetId: WidgetId
   title: string
   eyebrow?: string
   icon?: LucideIcon
   onRemove?: () => void
+  onReorderKey?: (delta: -1 | 1) => void
   children: ReactNode
   className?: string
   featured?: boolean
   interactive?: boolean
   showRemove?: boolean
+  reorderable?: boolean
 }) {
   const navigate = useNavigate()
 
@@ -54,6 +58,19 @@ export function WidgetFrame({
         interactive
           ? (event) => {
               if (fromNavControl(event.target)) return
+              if (
+                reorderable &&
+                (event.key === 'ArrowLeft' ||
+                  event.key === 'ArrowUp' ||
+                  event.key === 'ArrowRight' ||
+                  event.key === 'ArrowDown')
+              ) {
+                event.preventDefault()
+                onReorderKey?.(
+                  event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 1,
+                )
+                return
+              }
               if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault()
                 openDetail()
@@ -76,6 +93,18 @@ export function WidgetFrame({
           featured ? 'text-white' : 'text-ink',
         )}
       >
+        {reorderable ? (
+          <span
+            data-stop-nav
+            className={cn(
+              'widget-drag-handle -ml-1 flex h-6 w-4 shrink-0 cursor-grab items-center justify-center active:cursor-grabbing',
+              featured ? 'text-white/50 hover:text-white' : 'text-ink-soft/50 hover:text-ink-soft',
+            )}
+            title="Drag to reorder"
+          >
+            <GripVertical className="h-3.5 w-3.5" />
+          </span>
+        ) : null}
         {Icon ? (
           <Icon
             className={cn(
