@@ -59,7 +59,7 @@ export function CustomerProfilePage() {
           <Button asChild size="sm" variant="ghost" className="-ml-2 mb-2">
             <Link to="/customers">← Customers</Link>
           </Button>
-          <h1 className="font-serif text-3xl tracking-tight">{customer.name}</h1>
+          <h1 className="text-lg font-semibold tracking-tight">{customer.name}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {customer.propertyName}
             {customer.email ? ` · ${customer.email}` : ''}
@@ -71,27 +71,27 @@ export function CustomerProfilePage() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+            <CardTitle className="text-xs font-medium text-muted-foreground">
               Lifetime value
             </CardTitle>
           </CardHeader>
-          <CardContent className="font-serif text-3xl">
+          <CardContent className="text-2xl font-semibold tabular-nums">
             {formatMoney(customer.lifetimeValue)}
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+            <CardTitle className="text-xs font-medium text-muted-foreground">
               Visits
             </CardTitle>
           </CardHeader>
-          <CardContent className="font-serif text-3xl">
+          <CardContent className="text-2xl font-semibold tabular-nums">
             {formatNumber(customer.visitCount)}
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+            <CardTitle className="text-xs font-medium text-muted-foreground">
               Last visit
             </CardTitle>
           </CardHeader>
@@ -104,7 +104,7 @@ export function CustomerProfilePage() {
       {customer.preferredItems?.length ? (
         <div className="flex flex-wrap gap-2">
           {customer.preferredItems.map((item) => (
-            <Badge key={item} variant="gold">
+            <Badge key={item} variant="outline">
               {item}
             </Badge>
           ))}
@@ -123,14 +123,14 @@ export function CustomerProfilePage() {
       ) : null}
 
       <div>
-        <h2 className="mb-3 font-serif text-xl">Purchases</h2>
+        <h2 className="mb-3 text-sm font-medium">Purchases</h2>
         {customer.purchases.length === 0 ? (
           <PageState
             title="No purchases"
             message="This profile has no ticket history in the current scope."
           />
         ) : (
-          <div className="rounded-xl border border-border bg-card">
+          <div className="rounded-md border border-border bg-card">
             <Table>
               <TableHeader>
                 <TableRow>

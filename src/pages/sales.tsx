@@ -21,7 +21,7 @@ export function SalesPage() {
   return (
     <div>
       <div className="mb-5">
-        <h1 className="font-serif text-3xl tracking-tight">Sales</h1>
+        <h1 className="text-lg font-semibold tracking-tight">Sales</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Individual tickets: who sold, what was purchased, and when.
         </p>
@@ -55,7 +55,7 @@ export function SalesPage() {
       ) : null}
 
       {query.isSuccess && query.data.items.length > 0 ? (
-        <div className="rounded-xl border border-border bg-card">
+        <div className="rounded-md border border-border bg-card">
           <Table>
             <TableHeader>
               <TableRow>

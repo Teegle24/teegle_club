@@ -21,7 +21,7 @@ export function CustomersPage() {
   return (
     <div>
       <div className="mb-5">
-        <h1 className="font-serif text-3xl tracking-tight">Customers</h1>
+        <h1 className="text-lg font-semibold tracking-tight">Customers</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Profiles for guests and members in the current property scope.
         </p>
@@ -55,7 +55,7 @@ export function CustomersPage() {
       ) : null}
 
       {query.isSuccess && query.data.items.length > 0 ? (
-        <div className="rounded-xl border border-border bg-card">
+        <div className="rounded-md border border-border bg-card">
           <Table>
             <TableHeader>
               <TableRow>

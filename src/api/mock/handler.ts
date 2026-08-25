@@ -12,13 +12,14 @@ import {
   costsFor,
   idsFor,
   opportunitiesFor,
+  opsFor,
   pipelineFor,
   summaryFor,
   trendFor,
 } from '@/api/mock/snapshot'
 import type { DashboardLayout, Paginated, PeriodKey, PropertyScope, Sale } from '@/types'
 
-const LAYOUT_KEY = 'teegle-club.mock.dashboard-layout.v2'
+const LAYOUT_KEY = 'teegle-club.mock.dashboard-layout.v3'
 
 function delay(ms = 140) {
   return new Promise((resolve) => window.setTimeout(resolve, ms))
@@ -32,13 +33,9 @@ function periodOf(searchParams?: ApiRequestOptions['searchParams']): PeriodKey {
   return 'mtd'
 }
 
-function tabOf(searchParams?: ApiRequestOptions['searchParams'], body?: unknown) {
-  if (body && typeof body === 'object' && 'tab' in body) {
-    const tab = (body as DashboardLayout).tab
-    if (tab === 'ops' || tab === 'trends') return tab
-  }
-  const value = String(searchParams?.tab ?? 'trends')
-  return value === 'ops' ? 'ops' : 'trends'
+function layoutKey(scope?: PropertyScope) {
+  const suffix = !scope || scope.type === 'rollup' ? 'rollup' : scope.propertyId
+  return `${LAYOUT_KEY}.${suffix}`
 }
 
 function pageParams(searchParams?: ApiRequestOptions['searchParams']) {
@@ -66,11 +63,6 @@ function salesFor(scope?: PropertyScope): Sale[] {
 function customersFor(scope?: PropertyScope) {
   const ids = new Set(idsFor(scope))
   return customers.filter((customer) => ids.has(customer.propertyId))
-}
-
-function layoutKey(scope?: PropertyScope, tab = 'trends') {
-  const suffix = !scope || scope.type === 'rollup' ? 'rollup' : scope.propertyId
-  return `${LAYOUT_KEY}.${suffix}.${tab}`
 }
 
 export async function mockRequest<T>(options: ApiRequestOptions): Promise<T> {
@@ -116,6 +108,10 @@ export async function mockRequest<T>(options: ApiRequestOptions): Promise<T> {
     return opportunitiesFor(options.scope, period) as T
   }
 
+  if (path === '/metrics/ops' && method === 'GET') {
+    return opsFor(options.scope, period) as T
+  }
+
   if (path === '/sales' && method === 'GET') {
     return paginate(salesFor(options.scope), options.searchParams) as T
   }
@@ -135,9 +131,7 @@ export async function mockRequest<T>(options: ApiRequestOptions): Promise<T> {
   }
 
   if (path === '/me/dashboard-layout' && method === 'GET') {
-    const raw = localStorage.getItem(
-      layoutKey(options.scope, tabOf(options.searchParams)),
-    )
+    const raw = localStorage.getItem(layoutKey(options.scope))
     if (!raw) {
       throw new ApiError('No saved layout', 404, null)
     }
@@ -146,10 +140,7 @@ export async function mockRequest<T>(options: ApiRequestOptions): Promise<T> {
 
   if (path === '/me/dashboard-layout' && method === 'PUT') {
     const payload = options.body as DashboardLayout
-    localStorage.setItem(
-      layoutKey(options.scope, tabOf(options.searchParams, payload)),
-      JSON.stringify(payload),
-    )
+    localStorage.setItem(layoutKey(options.scope), JSON.stringify(payload))
     return payload as T
   }
 

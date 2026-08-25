@@ -9,7 +9,7 @@ export function ConfigError() {
         <p className="text-[11px] uppercase tracking-[0.18em] text-sidebar-muted">
           Teegle Club
         </p>
-        <h1 className="mt-2 font-serif text-3xl">Environment not configured</h1>
+        <h1 className="mt-2 text-xl font-semibold">Environment not configured</h1>
         <p className="mt-3 text-sm text-sidebar-muted">
           This dashboard talks to a separate REST API and Clerk. Copy
           <code className="mx-1 rounded bg-black/30 px-1.5 py-0.5 text-xs">

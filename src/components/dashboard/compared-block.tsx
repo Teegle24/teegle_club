@@ -1,11 +1,5 @@
 import type { ComparedValue } from '@/types'
-import {
-  deltaPct,
-  formatMoney,
-  formatNumber,
-  formatPercent,
-  formatSignedPercent,
-} from '@/lib/format'
+import { formatMoney, formatNumber, formatPercent } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 export function formatCompared(
@@ -16,6 +10,12 @@ export function formatCompared(
   if (format === 'percent') return formatPercent(value)
   return formatNumber(value)
 }
+
+const SERIES = [
+  { key: 'current', label: 'Now', field: 'current' as const },
+  { key: 'priorPeriod', label: 'Prior', field: 'priorPeriod' as const },
+  { key: 'priorYear', label: 'LY', field: 'priorYear' as const },
+]
 
 export function ComparedBlock({
   value,
@@ -28,49 +28,52 @@ export function ComparedBlock({
   invert?: boolean
   size?: 'lg' | 'md'
 }) {
-  const vsPrior = deltaPct(value.current, value.priorPeriod)
-  const vsYear = deltaPct(value.current, value.priorYear)
+  const current = value.current ?? 0
+  const prior = value.priorPeriod ?? 0
+  const delta = prior === 0 ? null : ((current - prior) / Math.abs(prior)) * 100
+  const improved = delta == null ? null : invert ? delta < 0 : delta > 0
+  const amounts = SERIES.map((row) => value[row.field] ?? 0)
+  const max = Math.max(...amounts, 1)
+  const summary = SERIES.map((row, index) => {
+    return `${row.label} ${formatCompared(amounts[index], format)}`
+  }).join(', ')
 
   return (
-    <div className="flex h-full flex-col justify-between">
+    <div className="flex h-full flex-col justify-between gap-4">
       <p
         className={cn(
-          'font-serif tabular-nums tracking-tight',
-          size === 'lg' ? 'text-3xl xl:text-4xl' : 'text-2xl',
+          'font-semibold tabular-nums tracking-tight',
+          size === 'lg' ? 'text-[1.7rem] leading-none' : 'text-[1.55rem] leading-none',
         )}
       >
         {formatCompared(value.current, format)}
       </p>
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">
-        <Delta label="vs prior" value={vsPrior} invert={invert} />
-        <Delta label="vs LY" value={vsYear} invert={invert} />
+      <div className="space-y-2" role="img" aria-label={summary}>
+        {SERIES.map((row, index) => {
+          const amount = amounts[index]
+          const width = Math.max(4, (amount / max) * 100)
+          const isNow = index === 0
+          return (
+            <div key={row.key} className="grid grid-cols-[2.4rem_1fr] items-center gap-2">
+              <span className="text-[10px] leading-none text-muted-foreground">{row.label}</span>
+              <div
+                className="h-2 overflow-hidden rounded-sm bg-muted"
+                title={`${row.label}: ${formatCompared(amount, format)}`}
+              >
+                <div
+                  className={cn(
+                    'h-full rounded-sm',
+                    isNow && improved === false && 'bg-destructive/80',
+                    isNow && improved !== false && 'bg-primary',
+                    !isNow && 'bg-foreground/25',
+                  )}
+                  style={{ width: `${width}%` }}
+                />
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
-  )
-}
-
-function Delta({
-  label,
-  value,
-  invert,
-}: {
-  label: string
-  value: number | null
-  invert: boolean
-}) {
-  const good = value == null ? null : invert ? value < 0 : value > 0
-  return (
-    <span className="text-muted-foreground">
-      {label}{' '}
-      <span
-        className={cn(
-          'font-medium tabular-nums',
-          good === true && 'text-emerald-700',
-          good === false && 'text-destructive',
-        )}
-      >
-        {formatSignedPercent(value)}
-      </span>
-    </span>
   )
 }

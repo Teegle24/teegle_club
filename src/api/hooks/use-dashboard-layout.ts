@@ -2,15 +2,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api, ApiError } from '@/api/client'
 import { useSession } from '@/auth/session'
 import { usePropertyScope } from '@/context/property-scope'
-import type { DashboardLayout, DashboardTab } from '@/types'
+import type { DashboardLayout } from '@/types'
 import { scopeKey } from '@/types'
 
-export function useDashboardLayout(tab: DashboardTab) {
+export function useDashboardLayout() {
   const { getToken, isLoaded, isSignedIn } = useSession()
   const { scope, allowedPropertyIds } = usePropertyScope()
 
   return useQuery({
-    queryKey: ['dashboard-layout', scopeKey(scope), tab],
+    queryKey: ['dashboard-layout', scopeKey(scope)],
     enabled: isLoaded && Boolean(isSignedIn),
     staleTime: 60_000,
     queryFn: async () => {
@@ -20,7 +20,6 @@ export function useDashboardLayout(tab: DashboardTab) {
           token,
           scope,
           allowedPropertyIds,
-          searchParams: { tab },
         })
       } catch (error) {
         if (error instanceof ApiError && error.status === 404) {
@@ -32,7 +31,7 @@ export function useDashboardLayout(tab: DashboardTab) {
   })
 }
 
-export function useSaveDashboardLayout(tab: DashboardTab) {
+export function useSaveDashboardLayout() {
   const { getToken } = useSession()
   const { scope, allowedPropertyIds } = usePropertyScope()
   const queryClient = useQueryClient()
@@ -40,19 +39,14 @@ export function useSaveDashboardLayout(tab: DashboardTab) {
   return useMutation({
     mutationFn: async (layout: DashboardLayout) => {
       const token = await getToken()
-      return api.put<DashboardLayout>(
-        '/me/dashboard-layout',
-        { ...layout, tab },
-        {
-          token,
-          scope,
-          allowedPropertyIds,
-          searchParams: { tab },
-        },
-      )
+      return api.put<DashboardLayout>('/me/dashboard-layout', layout, {
+        token,
+        scope,
+        allowedPropertyIds,
+      })
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(['dashboard-layout', scopeKey(scope), tab], data)
+      queryClient.setQueryData(['dashboard-layout', scopeKey(scope)], data)
     },
   })
 }

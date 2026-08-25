@@ -7,22 +7,21 @@ import { isMockMode } from '@/lib/config'
 export function AppShell() {
   const { isRollup, selectedProperty, access } = usePropertyScope()
   const contextLabel = isRollup
-    ? 'All linked properties'
+    ? 'All properties'
     : selectedProperty?.name ?? 'Property'
 
   return (
     <div className="flex min-h-svh bg-background">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 items-center justify-between border-b border-border bg-card/70 px-6 backdrop-blur">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-              {access?.organization.name ?? 'Teegle Club'}
-            </p>
-            <p className="text-sm font-medium">{contextLabel}</p>
-          </div>
+        <header className="flex h-12 items-center justify-between border-b border-border bg-card px-6">
+          <p className="text-[13px] text-muted-foreground">
+            <span className="text-foreground">{access?.organization.name ?? 'Teegle Club'}</span>
+            <span className="mx-2 text-border">/</span>
+            {contextLabel}
+          </p>
           {isMockMode() ? (
-            <Badge variant="gold">Demo data</Badge>
+            <Badge variant="outline">Demo</Badge>
           ) : null}
         </header>
         <main className="min-w-0 flex-1 overflow-auto p-6">

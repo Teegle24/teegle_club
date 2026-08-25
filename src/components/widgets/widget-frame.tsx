@@ -17,33 +17,31 @@ export function WidgetFrame({
   return (
     <section
       className={cn(
-        'flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm',
+        'flex h-full flex-col overflow-hidden rounded-md border border-border bg-card',
         className,
       )}
     >
-      <header className="flex items-center gap-1 border-b border-border px-2 py-1.5">
+      <header className="flex items-center gap-1 px-2 py-1.5">
         <button
           type="button"
-          className="widget-drag-handle flex h-7 w-7 cursor-grab items-center justify-center rounded-md text-muted-foreground active:cursor-grabbing"
+          className="widget-drag-handle flex h-6 w-6 cursor-grab items-center justify-center rounded text-muted-foreground/70 active:cursor-grabbing"
           aria-label={`Move ${title}`}
         >
-          <GripVertical className="h-4 w-4" />
+          <GripVertical className="h-3.5 w-3.5" />
         </button>
-        <h2 className="flex-1 truncate text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-          {title}
-        </h2>
+        <h2 className="flex-1 truncate text-[13px] font-medium">{title}</h2>
         <Button
           type="button"
           size="icon"
           variant="ghost"
-          className="h-7 w-7 text-muted-foreground"
+          className="h-6 w-6 text-muted-foreground"
           onClick={onRemove}
           aria-label={`Remove ${title}`}
         >
           <X className="h-3.5 w-3.5" />
         </Button>
       </header>
-      <div className="min-h-0 flex-1 p-4">{children}</div>
+      <div className="min-h-0 flex-1 px-4 pb-4 pt-1">{children}</div>
     </section>
   )
 }

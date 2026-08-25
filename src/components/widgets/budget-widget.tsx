@@ -5,8 +5,9 @@ import {
   WidgetLoading,
 } from '@/components/widget-states'
 import { formatMoney, formatNumber, formatPercent } from '@/lib/format'
+import type { BudgetRow } from '@/types'
 
-function display(metric: 'revenue' | 'rounds' | 'labor', value: number) {
+function display(metric: BudgetRow['metric'], value: number) {
   if (metric === 'rounds') return formatNumber(value)
   return formatMoney(value)
 }
@@ -32,8 +33,8 @@ export function BudgetWidget() {
       {query.data.map((row) => {
         const pct = row.budget ? (row.actual / row.budget) * 100 : 0
         const over = pct > 100
-        const laborBad = row.metric === 'labor' && over
-        const moneyBad = row.metric !== 'labor' && pct < 100
+        const costLine = row.metric === 'labor' || row.metric === 'maintenance'
+        const bad = costLine ? over : pct < 100
         return (
           <li key={row.metric}>
             <div className="mb-1 flex items-baseline justify-between text-sm">
@@ -48,7 +49,7 @@ export function BudgetWidget() {
             </div>
             <div className="h-1.5 overflow-hidden rounded-full bg-muted">
               <div
-                className={`h-full rounded-full ${laborBad || moneyBad ? 'bg-destructive/80' : 'bg-primary'}`}
+                className={`h-full rounded-full ${bad ? 'bg-destructive/80' : 'bg-primary'}`}
                 style={{ width: `${Math.min(pct, 100)}%` }}
               />
             </div>

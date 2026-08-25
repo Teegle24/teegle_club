@@ -21,9 +21,12 @@ export function formatMoneyPrecise(
   }).format(value)
 }
 
-export function formatNumber(value: number | null | undefined) {
+export function formatNumber(value: number | null | undefined, digits?: number) {
   if (value == null || Number.isNaN(value)) return '—'
-  return new Intl.NumberFormat('en-US').format(value)
+  return new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: digits ?? (Number.isInteger(value) ? 0 : 1),
+    minimumFractionDigits: digits,
+  }).format(value)
 }
 
 export function formatDateTime(iso: string | undefined) {

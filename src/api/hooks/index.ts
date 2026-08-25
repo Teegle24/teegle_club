@@ -12,5 +12,6 @@ export {
   useComparison,
   useCosts,
   useOpportunities,
+  useOps,
   usePipeline,
 } from './use-dashboard-metrics'

@@ -12,7 +12,7 @@ export function PeriodPicker() {
           type="button"
           onClick={() => setPeriod(option.key)}
           className={cn(
-            'rounded-md px-3 py-1.5 text-xs font-medium tracking-wide',
+            'rounded-md px-2.5 py-1 text-[12px] font-medium',
             period === option.key
               ? 'bg-primary text-primary-foreground'
               : 'text-muted-foreground hover:text-foreground',

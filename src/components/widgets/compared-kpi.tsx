@@ -5,14 +5,14 @@ import {
   WidgetError,
   WidgetLoading,
 } from '@/components/widget-states'
-import type { ComparedValue, MetricsSummary } from '@/types'
+import type { ComparedMetricKey, ComparedValue } from '@/types'
 
 export function ComparedKpiWidget({
   metric,
   format,
   invert = false,
 }: {
-  metric: keyof MetricsSummary
+  metric: ComparedMetricKey
   format: 'money' | 'number' | 'percent'
   invert?: boolean
 }) {

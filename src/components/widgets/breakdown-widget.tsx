@@ -22,7 +22,7 @@ export function BreakdownWidget({
   showMargin = false,
 }: {
   field: keyof MetricsBreakdown
-  format?: 'money' | 'number'
+  format?: 'money' | 'number' | 'percent'
   showMargin?: boolean
 }) {
   const query = useBreakdown()
@@ -52,7 +52,11 @@ export function BreakdownWidget({
         <XAxis
           type="number"
           tickFormatter={(value: number) =>
-            format === 'money' ? formatMoney(value) : formatNumber(value)
+            format === 'money'
+              ? formatMoney(value)
+              : format === 'percent'
+                ? formatPercent(value, 0)
+                : formatNumber(value)
           }
           tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
           axisLine={false}
@@ -69,7 +73,12 @@ export function BreakdownWidget({
         <Tooltip
           formatter={(value, _name, item) => {
             const payload = item?.payload as { marginPct?: number; sharePct?: number }
-            const main = format === 'money' ? formatMoney(Number(value)) : formatNumber(Number(value))
+            const main =
+              format === 'money'
+                ? formatMoney(Number(value))
+                : format === 'percent'
+                  ? formatPercent(Number(value))
+                  : formatNumber(Number(value))
             const extra = showMargin && payload.marginPct != null
               ? ` · ${formatPercent(payload.marginPct)} margin`
               : payload.sharePct != null

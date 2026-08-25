@@ -33,7 +33,7 @@ export function OpportunityWidget() {
             <p className="text-sm font-medium">{item.title}</p>
             <p className="mt-0.5 text-xs text-muted-foreground">{item.detail}</p>
           </div>
-          <p className="shrink-0 font-serif text-lg tabular-nums">
+          <p className="shrink-0 text-base font-semibold tabular-nums">
             {formatMoney(item.impactDollars)}
           </p>
         </li>

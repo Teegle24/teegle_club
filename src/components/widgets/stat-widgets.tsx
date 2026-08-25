@@ -22,7 +22,7 @@ export function BookingPaceWidget() {
   return (
     <div className="flex h-full flex-col justify-between">
       <div>
-        <p className="font-serif text-3xl tabular-nums">
+        <p className="text-2xl font-semibold tabular-nums">
           {formatNumber(query.data.advanceRounds)}
         </p>
         <p className="mt-1 text-xs text-muted-foreground">rounds booked forward</p>
@@ -48,19 +48,19 @@ export function CaptureWidget() {
   return (
     <dl className="grid h-full grid-cols-1 content-between gap-4">
       <div>
-        <dt className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        <dt className="text-xs text-muted-foreground">
           F&B capture
         </dt>
-        <dd className="font-serif text-2xl tabular-nums">
+        <dd className="text-2xl font-semibold tabular-nums">
           {formatPercent(query.data.fbCapturePct.current)}
         </dd>
         <p className="text-xs text-muted-foreground">rounds that bought food or drink</p>
       </div>
       <div>
-        <dt className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        <dt className="text-xs text-muted-foreground">
           Cart attach
         </dt>
-        <dd className="font-serif text-2xl tabular-nums">
+        <dd className="text-2xl font-semibold tabular-nums">
           {formatPercent(query.data.cartAttachPct.current)}
         </dd>
         <p className="text-xs text-muted-foreground">rounds that hit the beverage cart</p>
@@ -83,15 +83,15 @@ export function NewRepeatWidget() {
   return (
     <dl className="flex h-full flex-col justify-between">
       <div>
-        <dt className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        <dt className="text-xs text-muted-foreground">
           Repeat
         </dt>
-        <dd className="font-serif text-3xl tabular-nums">
+        <dd className="text-2xl font-semibold tabular-nums">
           {formatPercent(query.data.repeatGolferPct)}
         </dd>
       </div>
       <div>
-        <dt className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        <dt className="text-xs text-muted-foreground">
           New
         </dt>
         <dd className="text-xl tabular-nums">{formatPercent(query.data.newGolferPct)}</dd>
@@ -114,15 +114,15 @@ export function MembershipWidget() {
   return (
     <dl className="flex h-full flex-col justify-between">
       <div>
-        <dt className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        <dt className="text-xs text-muted-foreground">
           Renewal
         </dt>
-        <dd className="font-serif text-3xl tabular-nums">
+        <dd className="text-2xl font-semibold tabular-nums">
           {formatPercent(query.data.membershipRenewalPct)}
         </dd>
       </div>
       <div>
-        <dt className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        <dt className="text-xs text-muted-foreground">
           New enrollment
         </dt>
         <dd className="text-xl tabular-nums">
@@ -146,7 +146,7 @@ export function LeagueWidget() {
   }
   return (
     <div className="flex h-full flex-col justify-between">
-      <p className="font-serif text-3xl tabular-nums">
+      <p className="text-2xl font-semibold tabular-nums">
         {formatMoney(query.data.leagueOutingRevenue)}
       </p>
       <p className="text-xs text-muted-foreground">
@@ -199,15 +199,15 @@ export function MaintenanceWidget() {
   return (
     <dl className="flex h-full flex-col justify-between">
       <div>
-        <dt className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        <dt className="text-xs text-muted-foreground">
           Maintenance
         </dt>
-        <dd className="font-serif text-2xl tabular-nums">
+        <dd className="text-2xl font-semibold tabular-nums">
           {formatMoney(query.data.maintenanceSpend)}
         </dd>
       </div>
       <div>
-        <dt className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        <dt className="text-xs text-muted-foreground">
           Capex
         </dt>
         <dd className="text-xl tabular-nums">{formatMoney(query.data.capexSpend)}</dd>

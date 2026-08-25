@@ -49,7 +49,7 @@ export function PropertySwitcher() {
 
   return (
     <div className="space-y-1.5">
-      <p className="px-0.5 text-[10px] font-medium uppercase tracking-[0.16em] text-sidebar-muted">
+      <p className="px-0.5 text-[11px] text-sidebar-muted">
         {access.organization.name}
       </p>
       <Select

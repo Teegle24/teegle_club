@@ -9,6 +9,7 @@ import type {
   MetricsBreakdown,
   MetricsPipeline,
   OpportunityItem,
+  OpsMetrics,
   PropertyComparisonRow,
 } from '@/types'
 import { scopeKey } from '@/types'
@@ -63,4 +64,8 @@ export function useOpportunities() {
     '/metrics/opportunities',
     'metrics-opportunities',
   )
+}
+
+export function useOps() {
+  return useScopedGet<OpsMetrics>('/metrics/ops', 'metrics-ops')
 }
